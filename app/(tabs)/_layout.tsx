@@ -6,24 +6,31 @@ export default function TabLayout() {
 		<Tabs
 			screenOptions={{
 				headerShown: false,
-				tabBarActiveTintColor: "#B57EDC",
-				tabBarInactiveTintColor: "#9ca3af",
+				tabBarActiveTintColor: "#6E3F9C",
+				tabBarInactiveTintColor: "#94a3b8",
 				tabBarStyle: {
-					backgroundColor: "#fdf2f8",
-					borderTopColor: "#fce7f3",
-					borderTopWidth: 1,
-					paddingTop: 6,
-					height: 62,
+					backgroundColor: "#ffffff",
+					borderTopColor: "#f1f5f9",
+					height: 88,
+					paddingBottom: 28,
+					paddingTop: 12,
 				},
-				tabBarLabelStyle: { fontSize: 11, fontWeight: "500", marginBottom: 4 },
+				tabBarLabelStyle: {
+					fontSize: 12,
+					fontWeight: "600",
+				},
 			}}
 		>
 			<Tabs.Screen
 				name="index"
 				options={{
 					title: "Today",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="calendar-outline" color={color} size={size} />
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "home" : "home-outline"}
+							color={color}
+							size={24}
+						/>
 					),
 				}}
 			/>
@@ -31,32 +38,44 @@ export default function TabLayout() {
 				name="care"
 				options={{
 					title: "Care",
-					tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" color={color} size={size} />,
-				}}
-			/>
-			<Tabs.Screen
-				name="tips"
-				options={{
-					title: "Tips",
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons name="phone-portrait-outline" color={color} size={size} />
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "heart" : "heart-outline"}
+							color={color}
+							size={24}
+						/>
 					),
 				}}
 			/>
 			<Tabs.Screen
 				name="help"
 				options={{
-					title: "Help",
-					tabBarIcon: ({ color, size }) => <Ionicons name="medkit-outline" color={color} size={size} />,
+					title: "Get Help",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={
+								focused ? "shield-checkmark" : "shield-outline"
+							}
+							color={color}
+							size={24}
+						/>
+					),
 				}}
 			/>
 			<Tabs.Screen
 				name="partner"
 				options={{
 					title: "Partner",
-					tabBarIcon: ({ color, size }) => <Ionicons name="people-outline" color={color} size={size} />,
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "people" : "people-outline"}
+							color={color}
+							size={24}
+						/>
+					),
 				}}
 			/>
+			<Tabs.Screen name="tips" options={{ href: null }} />
 		</Tabs>
 	)
 }
