@@ -12,27 +12,39 @@ type Props = {
 	variant?: "default" | "danger"
 }
 
-export function HubLinkRow({ href, title, subtitle, icon, variant = "default" }: Props) {
+export function HubLinkRow({
+	href,
+	title,
+	subtitle,
+	icon,
+	variant = "default",
+}: Props) {
 	const border =
-		variant === "danger" ? "border-rose-200 bg-rose-50/80" : "border-pink-100 bg-white"
-
-	const iconBg = variant === "danger" ? "bg-rose-100" : "bg-[#f3e8ff]"
+		variant === "danger"
+			? "border-rose-100 bg-rose-50/50"
+			: "border-slate-100 bg-white"
+	const iconBg = variant === "danger" ? "bg-rose-100" : "bg-fuchsia-50"
+	const iconColor = variant === "danger" ? "#E11D48" : "#6E3F9C"
 
 	return (
 		<Link href={href} asChild>
 			<Pressable
-				className={`mb-3 flex-row items-center gap-4 rounded-2xl border px-4 py-4 shadow-sm shadow-purple-900/5 active:opacity-90 ${border}`}
+				className={`mb-4 flex-row items-center gap-4 rounded-[24px] border px-5 py-5 shadow-sm shadow-purple-900/5 active:scale-[0.99] ${border}`}
 			>
-				<View className={`rounded-2xl p-3 ${iconBg}`}>
-					<Ionicons name={icon} size={24} color={variant === "danger" ? "#be185d" : PURPLE} />
+				<View className={`rounded-xl p-3 ${iconBg}`}>
+					<Ionicons name={icon} size={24} color={iconColor} />
 				</View>
 				<View className="min-w-0 flex-1">
-					<Text className="text-base font-semibold text-mum-ink">{title}</Text>
-					{subtitle ? (
-						<Text className="mt-0.5 text-sm leading-5 text-mum-ink/65">{subtitle}</Text>
-					) : null}
+					<Text className="text-lg font-bold text-[#2D1643]">
+						{title}
+					</Text>
+					{subtitle && (
+						<Text className="mt-0.5 text-sm leading-5 text-[#2D1643]/50">
+							{subtitle}
+						</Text>
+					)}
 				</View>
-				<Ionicons name="chevron-forward" size={20} color={PURPLE} />
+				<Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
 			</Pressable>
 		</Link>
 	)
