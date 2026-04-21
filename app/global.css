@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-mum-purple: #B57EDC;
+  --color-mum-purpleDeep: #6E3F9C;
+  --color-mum-bg: #FDF2F8;
+  --color-mum-ink: #2A1B3D;
+  --color-mum-mist: #FaF5FF;
+  --color-mum-petal: #FCE7F3;
+}
