@@ -31,7 +31,6 @@ export default function PartnerScreen() {
 				}}
 				showsVerticalScrollIndicator={false}
 			>
-				{/* 1. PARTNER STATUS: Highlighting the Connection */}
 				<LinearGradient
 					colors={["#E9D5FF", "#F5F3FF"]}
 					start={{ x: 0, y: 0 }}
@@ -56,7 +55,6 @@ export default function PartnerScreen() {
 					</View>
 				</LinearGradient>
 
-				{/* 2. TASK REQUEST SECTION */}
 				<View className="mb-8 rounded-[32px] bg-white p-6 border border-mum-petal shadow-sm">
 					<Text className="text-lg font-bold text-mum-ink">
 						Need a hand?
@@ -80,7 +78,6 @@ export default function PartnerScreen() {
 					</View>
 				</View>
 
-				{/* 3. PARTNER'S PROGRESS SECTION */}
 				<View className="flex-row items-center justify-between mb-4 px-1">
 					<Text className="text-sm font-bold uppercase tracking-widest text-mum-ink/40">
 						His Tasks Tonight
@@ -92,12 +89,10 @@ export default function PartnerScreen() {
 					</View>
 				</View>
 
-				{/* Using TaskItem so she can see the same "Checked" status as him */}
 				{partnerTasks.map((task, index) => (
 					<TaskItem key={index} task={task} />
 				))}
 
-				{/* 4. ENCOURAGEMENT FOOTER */}
 				<View className="mt-6 items-center px-4">
 					<Ionicons name="heart" size={24} color="#db2777" />
 					<Text className="mt-2 text-center text-xs italic text-mum-ink/40 leading-5">

@@ -12,11 +12,20 @@ export default function RootLayout() {
 					headerStyle: { backgroundColor: "#fdf2f8" },
 					headerTintColor: "#B57EDC",
 					headerShadowVisible: false,
-					headerTitleStyle: { fontWeight: "600", color: "#2A1B3D", fontSize: 17 },
+					headerTitleStyle: {
+						fontWeight: "600",
+						color: "#2A1B3D",
+						fontSize: 17,
+					},
 					contentStyle: { backgroundColor: "#fdf2f8" },
 				}}
 			>
 				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+				{/* Explicitly defining the hub here fixes the context error */}
+				<Stack.Screen
+					name="romance-hub"
+					options={{ headerTitle: "Romance", presentation: "card" }}
+				/>
 			</Stack>
 		</SafeAreaProvider>
 	)

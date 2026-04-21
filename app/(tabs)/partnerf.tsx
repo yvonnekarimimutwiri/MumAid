@@ -3,6 +3,7 @@ import { ScrollView, Text, View, Pressable } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 import { TaskItem } from "@/components/TaskItem"
+import { Link } from "expo-router"
 
 const tasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
@@ -58,6 +59,36 @@ export default function PartnerTabScreen() {
 						</View>
 					</View>
 				</LinearGradient>
+
+				<Link href="/romance-hub" asChild>
+					<Pressable className="mb-8 overflow-hidden rounded-[32px] active:scale-[0.98]">
+						<LinearGradient
+							colors={["#FF9A8B", "#FF6A88", "#FF99AC"]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							className="flex-row items-center justify-between p-6"
+						>
+							<View className="flex-1 pr-4">
+								<Text className="text-xs font-bold uppercase tracking-widest text-white/80">
+									Relationship
+								</Text>
+								<Text className="mt-1 text-2xl font-bold text-white">
+									Date Night & Romance
+								</Text>
+								<Text className="mt-1 text-white/90">
+									Keep the spark alive while baby sleeps
+								</Text>
+							</View>
+							<View className="h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
+								<Ionicons
+									name="heart"
+									size={32}
+									color="white"
+								/>
+							</View>
+						</LinearGradient>
+					</Pressable>
+				</Link>
 
 				<View className="flex-row items-center justify-between mb-4 px-1">
 					<Text className="text-sm font-bold uppercase tracking-widest text-mum-ink/40">
