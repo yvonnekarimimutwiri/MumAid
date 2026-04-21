@@ -66,7 +66,7 @@ export default function TodayScreen() {
 							<Ionicons
 								name="calendar-outline"
 								size={22}
-								color={PURPLE}
+								color="#000000"
 							/>
 						</Pressable>
 						<Link href="/settings" asChild>
@@ -74,7 +74,7 @@ export default function TodayScreen() {
 								<Ionicons
 									name="settings-outline"
 									size={22}
-									color={PURPLE}
+									color="#000000"
 								/>
 							</Pressable>
 						</Link>
@@ -97,7 +97,7 @@ export default function TodayScreen() {
 						You’re not alone
 					</Text>
 					<Text className="mt-2 text-center text-[32px] font-bold leading-tight text-mum-ink">
-						Help when you need it
+						Simplifying Motherhood, One Day at a Time
 					</Text>
 					<Text className="mt-3 text-center text-[15px] leading-5 text-mum-ink/70">
 						Practical support — no mood logs or daily check‑ins
