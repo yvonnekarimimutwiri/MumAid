@@ -23,8 +23,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
 	useEffect(() => {
 		const loadTheme = async () => {
-			const saved = await AsyncStorage.getItem("user-theme")
-			if (saved) setTheme(JSON.parse(saved))
+			try {
+				const saved = await AsyncStorage.getItem("user-theme")
+				if (saved) setTheme(JSON.parse(saved))
+			} catch {
+				// Corrupt storage shouldn't block app startup
+			}
 		}
 		loadTheme()
 	}, [])

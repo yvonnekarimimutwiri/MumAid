@@ -50,7 +50,7 @@ export default function MilkScreen() {
 				onPress={() =>
 					router.push({
 						pathname: "/milk-map",
-						params: { mode: "DONATE" },
+						params: { mode: "BUY" },
 					})
 				}
 				className="mb-3 flex-row items-center gap-3 rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm active:opacity-90"
