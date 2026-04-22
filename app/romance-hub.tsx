@@ -106,7 +106,7 @@ export default function RomanceHubScreen() {
 		scrollX.setValue(0)
 
 		const totalItems = DATE_IDEAS.length
-		const spins = 5
+		const spins = 1
 		const finalLanding = Math.floor(Math.random() * totalItems)
 		const targetOffset =
 			spins * totalItems * TOTAL_ITEM_WIDTH +
@@ -116,7 +116,7 @@ export default function RomanceHubScreen() {
 			toValue: -targetOffset + (width / 2 - ITEM_WIDTH / 2 - 20),
 			duration: 5000,
 			easing: Easing.out(Easing.bezier(0.22, 1, 0.36, 1)),
-			useNativeDriver: true,
+			useNativeDriver: false,
 		}).start(() => {
 			setSelectedIndex(finalLanding)
 			setIsSpinning(false)
@@ -156,7 +156,7 @@ export default function RomanceHubScreen() {
 								transform: [{ translateX: scrollX }],
 							}}
 						>
-							{[...Array(8)].map((_, loopIdx) =>
+							{[...Array(4)].map((_, loopIdx) =>
 								DATE_IDEAS.map((item, idx) => {
 									const isTarget =
 										selectedIndex === idx && !isSpinning
@@ -166,10 +166,11 @@ export default function RomanceHubScreen() {
 											style={{
 												width: ITEM_WIDTH,
 												marginRight: ITEM_SPACING,
+												elevation: isTarget ? 12 : 0,
 											}}
 											className={`h-[180px] rounded-[32px] p-6 justify-between border-2 ${
 												isTarget
-													? "bg-mum-purpleDeep border-white shadow-xl scale-105"
+													? "bg-mum-purpleDeep border-white scale-105"
 													: "bg-white border-mum-petal"
 											}`}
 										>
@@ -210,10 +211,10 @@ export default function RomanceHubScreen() {
 						<Pressable
 							onPress={spinPicker}
 							disabled={isSpinning}
-							className={`rounded-full py-4 shadow-md active:opacity-90 ${isSpinning ? "bg-mum-petal" : "bg-mum-purpleDeep"}`}
+							style={{ elevation: 6 }}
+							className={`rounded-full py-4 active:opacity-90 ${isSpinning ? "bg-mum-petal" : "bg-mum-purpleDeep"}`}
 						>
 							<Text className="text-center font-bold text-white uppercase tracking-widest">
-								<Text className="bg-red-600">DON'T</Text>{" "}
 								{isSpinning
 									? "Choosing..."
 									: "Spin for Date Idea"}
@@ -242,8 +243,9 @@ export default function RomanceHubScreen() {
 										],
 									},
 								],
+								elevation: 3,
 							}}
-							className="mb-6 rounded-2xl p-6 shadow-sm border border-black/5"
+							className="mb-6 rounded-2xl p-6 border border-black/5"
 						>
 							<Text className="text-base font-medium leading-6 text-mum-inkDeep/80 italic">
 								"{tip}"
