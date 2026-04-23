@@ -118,7 +118,7 @@ export default function CareHubScreen() {
 				<Text className="mb-4 px-1 text-sm text-[#2D1643]/60">
 					All your baby support in one place: remedies and feeding support.
 				</Text>
-				<View className="flex-row flex-wrap justify-between">
+				<View className="flex-row flex-wrap justify-center gap-4">
 					<GridCard
 						href="/remedies"
 						title="Remedies"

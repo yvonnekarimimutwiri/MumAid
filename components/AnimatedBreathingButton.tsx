@@ -35,7 +35,7 @@ export function AnimatedBreathingButton() {
 				zIndex: 50,
 			}}
 		>
-			<Link href="/breathing" asChild>
+			<Link href="/breathing-menu" asChild>
 				<Pressable className="active:scale-90">
 					<Animated.View
 						style={{

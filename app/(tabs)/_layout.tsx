@@ -50,9 +50,9 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="mumtok"
+				name="mumtalk"
 				options={{
-					title: "MumTok",
+					title: "MumTalk",
 					tabBarIcon: ({ color, focused }) => (
 						<Ionicons
 							name={focused ? "play-circle" : "play-circle-outline"}

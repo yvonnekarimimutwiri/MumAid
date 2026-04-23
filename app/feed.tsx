@@ -3,7 +3,8 @@ import { Ionicons } from "@expo/vector-icons"
 import { useFocusEffect, useIsFocused } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
 import { LinearGradient } from "expo-linear-gradient"
-import { setStatusBarStyle, StatusBar } from "expo-status-bar"
+import { useNavigation } from "expo-router"
+import { setStatusBarStyle } from "expo-status-bar"
 import { useVideoPlayer, VideoView } from "expo-video"
 import { useCallback, useEffect, useState } from "react"
 import {
@@ -12,6 +13,7 @@ import {
 	LayoutChangeEvent,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
+	Platform,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -26,14 +28,38 @@ export default function FeedScreen() {
 	const [activeIndex, setActiveIndex] = useState(0)
 	const isFocused = useIsFocused()
 
+	const navigation = useNavigation()
+	const tabNavigation = navigation.getParent("tabs") || navigation.getParent()
+	console.log(tabNavigation)
+
 	useFocusEffect(
 		useCallback(() => {
 			setStatusBarStyle("light")
 
+			tabNavigation?.setOptions({
+				tabBarStyle: {
+					backgroundColor: "#000000",
+					borderTopColor: "rgba(255,255,255,0.1)",
+					height: 60,
+				},
+				tabBarActiveTintColor: "#d946ef",
+				tabBarInactiveTintColor: "#ffffff",
+			})
+
 			return () => {
 				setStatusBarStyle("dark")
+
+				tabNavigation?.setOptions({
+					tabBarStyle: {
+						backgroundColor: "#fefbfd",
+						borderTopColor: "#f1f5f9",
+					},
+					tabBarActiveTintColor: "#6E3F9C",
+									tabBarInactiveTintColor:
+										Platform.OS === "ios" ? "#000000" : "#52637a",
+				})
 			}
-		}, []),
+		}, [tabNavigation]),
 	)
 
 	const handleLayout = (event: LayoutChangeEvent) => {
@@ -61,7 +87,6 @@ export default function FeedScreen() {
 
 	return (
 		<View className="flex-1 bg-black" onLayout={handleLayout}>
-
 			<LinearGradient
 				colors={["#501584", "#3b1060", "#000000"]}
 				style={StyleSheet.absoluteFillObject}
@@ -167,14 +192,8 @@ function VideoItem({
 	const isError = status === "error"
 
 	return (
-		<View
-			style={{ height: screenHeight }}
-			className="w-full relative"
-		>
-			<Pressable
-				onPress={togglePlay}
-				className="flex-1 overflow-hidden"
-			>
+		<View style={{ height: screenHeight }} className="w-full relative">
+			<Pressable onPress={togglePlay} className="flex-1 overflow-hidden">
 				{!isError ? (
 					<VideoView
 						player={player}

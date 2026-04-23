@@ -17,7 +17,7 @@ const quickInsights = [
 		accent: "rose" as const,
 	},
 	{
-		href: "/breathing" as const,
+		href: "/breathing-menu" as const,
 		label: "Breathe",
 		icon: "radio-button-on" as const,
 		accent: "fuchsia" as const,
@@ -103,7 +103,7 @@ export default function TodayScreen() {
 						Practical support — no mood logs or daily check‑ins
 						required.
 					</Text>
-					<Link href="/care" asChild>
+					<Link href="/baby" asChild>
 						<Pressable
 							className="mt-6 self-center rounded-full px-7 py-3.5 shadow-lg active:opacity-90"
 							style={{ backgroundColor: PURPLE_DEEP }}

@@ -35,6 +35,10 @@ export default function RootLayout() {
 							presentation: "card",
 						}}
 					/>
+					<Stack.Screen
+						name="bubble-screen"
+						options={{ headerShown: false }}
+					/>
 				</Stack>
 			</SafeAreaProvider>
 		</ThemeProvider>
