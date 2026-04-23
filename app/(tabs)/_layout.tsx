@@ -39,10 +39,23 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="care"
 				options={{
-					title: "Care",
+					title: "Baby",
 					tabBarIcon: ({ color, focused }) => (
 						<Ionicons
-							name={focused ? "heart" : "heart-outline"}
+							name={focused ? "happy" : "happy-outline"}
+							color={color}
+							size={24}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="mumtok"
+				options={{
+					title: "MumTok",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "play-circle" : "play-circle-outline"}
 							color={color}
 							size={24}
 						/>
@@ -80,14 +93,7 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="partnerf"
 				options={{
-					title: "Father",
-					tabBarIcon: ({ color, focused }) => (
-						<Ionicons
-							name={focused ? "person" : "person-outline"}
-							color={color}
-							size={24}
-						/>
-					),
+					href: null,
 				}}
 			/>
 			<Tabs.Screen name="tips" options={{ href: null }} />

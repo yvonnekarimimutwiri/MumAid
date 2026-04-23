@@ -1,15 +1,39 @@
 import { HubLinkRow } from "@/components/HubLinkRow"
-import { ScrollView, Text, View, Dimensions } from "react-native"
+import { ScrollView, Text, View, Dimensions, Pressable, TextInput } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Link } from "expo-router"
-import { Pressable } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
+import { useMemo, useState } from "react"
+import { Image } from "expo-image"
 
 const { width } = Dimensions.get("window")
 
 export default function CareHubScreen() {
 	const insets = useSafeAreaInsets()
+	const [registrationDate, setRegistrationDate] = useState(
+		new Date().toISOString().slice(0, 10),
+	)
+	const [manualAgeMonths, setManualAgeMonths] = useState("")
+
+	const ageData = useMemo(() => {
+		const manualMonths = Number(manualAgeMonths)
+		const hasManualAge = Number.isFinite(manualMonths) && manualMonths >= 0
+
+		if (hasManualAge) {
+			return buildAgeData(Math.floor(manualMonths))
+		}
+
+		const registration = new Date(registrationDate)
+		if (Number.isNaN(registration.getTime())) {
+			return buildAgeData(0)
+		}
+
+		const now = new Date()
+		const diffMs = Math.max(0, now.getTime() - registration.getTime())
+		const computedMonths = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30.4375))
+		return buildAgeData(computedMonths)
+	}, [registrationDate, manualAgeMonths])
 
 	return (
 		<View
@@ -17,7 +41,7 @@ export default function CareHubScreen() {
 			style={{ paddingTop: insets.top + 8 }}
 		>
 			<Text className="px-6 pb-6 text-3xl font-black text-[#2D1643]">
-				Care
+				Baby
 			</Text>
 
 			<ScrollView
@@ -28,6 +52,65 @@ export default function CareHubScreen() {
 				}}
 				showsVerticalScrollIndicator={false}
 			>
+				<LinearGradient
+					colors={["#fbcfe8", "#fce7f3"]}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 1 }}
+					className="mb-6 rounded-[32px] p-6 shadow-sm border border-white/50"
+				>
+					<View className="flex-row items-center justify-between">
+						<View>
+							<Text className="text-xs font-bold uppercase tracking-widest text-pink-600/80">
+								Baby is
+							</Text>
+							<Text className="mt-1 text-3xl font-black text-mum-ink">
+								{ageData.label}
+							</Text>
+							<Text className="mt-1 text-sm font-medium text-mum-ink/50">
+								{ageData.subLabel}
+							</Text>
+						</View>
+						<View className="h-20 w-20 overflow-hidden rounded-2xl bg-white/40">
+							<Image
+								source={{ uri: ageData.imageUri }}
+								contentFit="cover"
+								style={{ width: "100%", height: "100%" }}
+							/>
+						</View>
+					</View>
+				</LinearGradient>
+
+				<View className="mb-8 rounded-[28px] border border-mum-purpleSoft/30 bg-white p-5">
+					<Text className="text-sm font-bold uppercase tracking-widest text-mum-ink/40">
+						Baby Growth Input
+					</Text>
+					<Text className="mt-2 text-sm text-mum-ink/60">
+						Age auto-calculates from registration date. You can also type age in months.
+					</Text>
+					<Text className="mt-4 text-xs font-bold uppercase tracking-widest text-mum-ink/40">
+						Registration Date (YYYY-MM-DD)
+					</Text>
+					<TextInput
+						value={registrationDate}
+						onChangeText={setRegistrationDate}
+						placeholder="2026-01-15"
+						className="mt-2 rounded-2xl border border-mum-purpleSoft/30 px-4 py-3 text-mum-ink"
+					/>
+					<Text className="mt-4 text-xs font-bold uppercase tracking-widest text-mum-ink/40">
+						Manual Age (Months)
+					</Text>
+					<TextInput
+						value={manualAgeMonths}
+						onChangeText={setManualAgeMonths}
+						placeholder="e.g. 3"
+						keyboardType="numeric"
+						className="mt-2 rounded-2xl border border-mum-purpleSoft/30 px-4 py-3 text-mum-ink"
+					/>
+					<Text className="mt-2 text-xs text-mum-ink/50">
+						Clear manual age to use registration-date calculation again.
+					</Text>
+				</View>
+
 				<Link href="/breathing" asChild>
 					<Pressable className="mb-8 overflow-hidden rounded-[32px] shadow-xl shadow-purple-200">
 						<LinearGradient
@@ -58,8 +141,11 @@ export default function CareHubScreen() {
 					</Pressable>
 				</Link>
 
-				<Text className="mb-4 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">
-					Baby & Body
+				<Text className="mb-2 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">
+					Baby Essentials
+				</Text>
+				<Text className="mb-4 px-1 text-sm text-[#2D1643]/60">
+					All your baby support in one place: remedies, movement, feeding, and calming tools.
 				</Text>
 				<View className="flex-row flex-wrap justify-between">
 					<GridCard
@@ -79,31 +165,6 @@ export default function CareHubScreen() {
 						width={(width - 52) / 2}
 					/>
 				</View>
-
-				<Link href="/tips" asChild>
-					<Pressable className="mt-4 mb-8 flex-row items-center gap-4 rounded-[24px] border border-purple-100 bg-purple-50/50 p-4 active:scale-[0.98]">
-						<View className="rounded-xl bg-purple-200 p-3">
-							<Ionicons
-								name="play-circle"
-								size={24}
-								color="#6E3F9C"
-							/>
-						</View>
-						<View className="flex-1">
-							<Text className="text-lg font-bold text-[#2D1643]">
-								Video Tips
-							</Text>
-							<Text className="text-sm text-[#2D1643]/60">
-								15s clips from other mums
-							</Text>
-						</View>
-						<Ionicons
-							name="chevron-forward"
-							size={20}
-							color="#6E3F9C"
-						/>
-					</Pressable>
-				</Link>
 
 				<Text className="mb-4 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">
 					Feeding
@@ -161,4 +222,28 @@ function GridCard({ href, title, icon, color, iconColor, width }: any) {
 			</Pressable>
 		</Link>
 	)
+}
+
+function buildAgeData(ageMonths: number) {
+	if (ageMonths < 4) {
+		return {
+			label: `${ageMonths * 4} Weeks`,
+			subLabel: `${ageMonths} month${ageMonths === 1 ? "" : "s"} · Newborn stage`,
+			imageUri: "https://em-content.zobj.net/source/apple/391/baby_1f476.png",
+		}
+	}
+
+	if (ageMonths < 12) {
+		return {
+			label: `${ageMonths} Months`,
+			subLabel: "Infant stage · Rolling and sitting",
+			imageUri: "https://em-content.zobj.net/source/apple/391/baby_1f476.png",
+		}
+	}
+
+	return {
+		label: `${Math.floor(ageMonths / 12)} Year${Math.floor(ageMonths / 12) > 1 ? "s" : ""}`,
+		subLabel: "Toddler stage · Walking and exploring",
+		imageUri: "https://em-content.zobj.net/source/apple/391/child_1f9d2.png",
+	}
 }

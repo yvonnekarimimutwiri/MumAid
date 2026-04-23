@@ -171,35 +171,6 @@ export default function TodayScreen() {
 						</Pressable>
 					</Link>
 
-					<Link href="/feed" asChild>
-						<Pressable className="mt-4 overflow-hidden rounded-3xl active:opacity-95">
-							<LinearGradient
-								colors={["#c084fc", "#B57EDC", "#7e22ce"]}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 1 }}
-								style={{ borderRadius: 24, padding: 20 }}
-							>
-								<View className="flex-row items-center justify-between">
-									<View className="max-w-[72%]">
-										<Text className="text-xs font-semibold uppercase tracking-widest text-white/90">
-											Mum tips
-										</Text>
-										<Text className="mt-2 text-lg font-semibold text-white">
-											15‑second clips from mums
-										</Text>
-									</View>
-									<Ionicons
-										name="play-circle"
-										size={44}
-										color="#fce7f3"
-									/>
-								</View>
-								<Text className="mt-3 text-sm text-white/90">
-									Tap to open the full feed →
-								</Text>
-							</LinearGradient>
-						</Pressable>
-					</Link>
 				</View>
 			</ScrollView>
 			<AnimatedBreathingButton />
