@@ -36,7 +36,7 @@
 			[
 				"expo-splash-screen",
 				{
-					"image": "./assets/icons/mumaid-icon-no-bg-1024.png",
+					"image": "./assets/icons/mumaid-icon-no-bg.png",
 					"imageWidth": 180,
 					"resizeMode": "contain",
 					"backgroundColor": "#ffffff",
