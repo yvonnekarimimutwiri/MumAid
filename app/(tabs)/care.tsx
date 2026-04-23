@@ -111,41 +111,11 @@ export default function CareHubScreen() {
 					</Text>
 				</View>
 
-				<Link href="/breathing" asChild>
-					<Pressable className="mb-8 overflow-hidden rounded-[32px] shadow-xl shadow-purple-200">
-						<LinearGradient
-							colors={["#6E3F9C", "#8B5CF6"]}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 1 }}
-							className="flex-row items-center justify-between p-6"
-						>
-							<View className="flex-1 pr-4">
-								<Text className="text-xs font-bold uppercase tracking-[2px] text-white/70">
-									Instant Reset
-								</Text>
-								<Text className="mt-1 text-2xl font-bold text-white">
-									Breathing Bubble
-								</Text>
-								<Text className="mt-1 text-white/80">
-									10 seconds to find your calm
-								</Text>
-							</View>
-							<View className="h-16 w-16 items-center justify-center rounded-full bg-white/20">
-								<Ionicons
-									name="radio-button-on"
-									size={40}
-									color="white"
-								/>
-							</View>
-						</LinearGradient>
-					</Pressable>
-				</Link>
-
 				<Text className="mb-2 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">
 					Baby Essentials
 				</Text>
 				<Text className="mb-4 px-1 text-sm text-[#2D1643]/60">
-					All your baby support in one place: remedies, movement, feeding, and calming tools.
+					All your baby support in one place: remedies and feeding support.
 				</Text>
 				<View className="flex-row flex-wrap justify-between">
 					<GridCard
@@ -154,14 +124,6 @@ export default function CareHubScreen() {
 						icon="medkit"
 						color="#FEE2E2"
 						iconColor="#EF4444"
-						width={(width - 52) / 2}
-					/>
-					<GridCard
-						href="/exercises"
-						title="Exercise"
-						icon="fitness"
-						color="#DBEAFE"
-						iconColor="#3B82F6"
 						width={(width - 52) / 2}
 					/>
 				</View>

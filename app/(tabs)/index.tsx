@@ -171,6 +171,42 @@ export default function TodayScreen() {
 						</Pressable>
 					</Link>
 
+					<Link href="/exercises" asChild>
+						<Pressable className="mt-4 overflow-hidden rounded-3xl border border-pink-100 bg-white p-5 shadow-md shadow-purple-900/5 active:opacity-95">
+							<View className="flex-row items-start justify-between gap-3">
+								<View className="flex-1">
+									<Text className="text-lg font-semibold text-mum-ink">
+										Movement exercises
+									</Text>
+									<Text className="mt-2 text-sm leading-5 text-mum-ink/65">
+										Gentle routines for strength, posture, and recovery.
+									</Text>
+								</View>
+								<View className="rounded-2xl bg-[#dbeafe] p-3">
+									<Ionicons
+										name="fitness"
+										size={28}
+										color="#3B82F6"
+									/>
+								</View>
+							</View>
+							<View className="mt-4 flex-row items-center">
+								<Text
+									className="text-sm font-semibold"
+									style={{ color: PURPLE }}
+								>
+									Open exercises
+								</Text>
+								<Ionicons
+									name="chevron-forward"
+									size={18}
+									color={PURPLE}
+									style={{ marginLeft: 4 }}
+								/>
+							</View>
+						</Pressable>
+					</Link>
+
 				</View>
 			</ScrollView>
 			<AnimatedBreathingButton />

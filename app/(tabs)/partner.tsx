@@ -3,6 +3,7 @@ import { ScrollView, Text, View, Pressable } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 import { TaskItem } from "@/components/TaskItem" // Same component, reusable logic
+import { Link } from "expo-router"
 
 const partnerTasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
@@ -63,6 +64,13 @@ export default function PartnerScreen() {
 							Copy Invite Link
 						</Text>
 					</Pressable>
+					<Link href="/partnerf" asChild>
+						<Pressable className="mt-2 rounded-full border border-mum-purpleDeep/30 bg-white/70 px-6 py-3 active:opacity-90">
+							<Text className="text-center font-bold text-mum-purpleDeep">
+								Go to Father Page
+							</Text>
+						</Pressable>
+					</Link>
 					<View className="mt-4 flex-row items-center gap-2">
 						<Ionicons
 							name="checkmark-circle"
