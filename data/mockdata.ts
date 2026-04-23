@@ -79,3 +79,27 @@ export const MILK_LOCATIONS: MilkLoc[] = [
 		type: "BOTH",
 	},
 ]
+
+export const VIDEOS = [
+	{
+		id: "1",
+		// source: require("@/assets/uploads/first_time_mom_5_hacks.mp4"),
+		source: "",
+		topic: "NUTRITION",
+		caption: "Best first foods for baby.",
+	},
+	{
+		id: "2",
+		// source: require("@/assets/uploads/newborn_tips_for_beginners.mp4"),
+		source: "",
+		topic: "SLEEP",
+		caption: "The 4-month sleep regression survival guide.",
+	},
+	{
+		id: "3",
+		// source: require("@/assets/uploads/tips_for_expecting_mums.mp4"),
+		source: "",
+		topic: "WELLNESS",
+		caption: "5-minute mindfulness for busy moms.",
+	},
+]

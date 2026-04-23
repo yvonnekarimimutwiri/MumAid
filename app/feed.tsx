@@ -1,68 +1,272 @@
-import { mumTipsFeed } from "@/lib/content"
+import { VIDEOS } from "@/data/mockdata"
 import { Ionicons } from "@expo/vector-icons"
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native"
-
-export const options = {
-	title: "MumTok",
-	headerStyle: { backgroundColor: "#3D2A55" },
-	headerTintColor: "#fce7f3",
-	headerTitleStyle: { color: "#fdf4ff", fontWeight: "600" as const },
-}
-
-const { height } = Dimensions.get("window")
+import { useFocusEffect, useIsFocused } from "@react-navigation/native"
+import * as ImagePicker from "expo-image-picker"
+import { LinearGradient } from "expo-linear-gradient"
+import { setStatusBarStyle, StatusBar } from "expo-status-bar"
+import { useVideoPlayer, VideoView } from "expo-video"
+import { useCallback, useEffect, useState } from "react"
+import {
+	ActivityIndicator,
+	Dimensions,
+	LayoutChangeEvent,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native"
 
 export default function FeedScreen() {
+	const [viewHeight, setViewHeight] = useState(
+		Dimensions.get("window").height,
+	)
+	const [activeIndex, setActiveIndex] = useState(0)
+	const isFocused = useIsFocused()
+
+	useFocusEffect(
+		useCallback(() => {
+			setStatusBarStyle("light")
+
+			return () => {
+				setStatusBarStyle("dark")
+			}
+		}, []),
+	)
+
+	const handleLayout = (event: LayoutChangeEvent) => {
+		setViewHeight(event.nativeEvent.layout.height)
+	}
+
+	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const yOffset = event.nativeEvent.contentOffset.y
+		const index = Math.round(yOffset / viewHeight)
+		if (index !== activeIndex) {
+			setActiveIndex(index)
+		}
+	}
+
+	const pickVideo = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["videos"],
+			allowsEditing: true,
+			quality: 1,
+		})
+		if (!result.canceled) {
+			console.log("Selected video:", result.assets[0].uri)
+		}
+	}
+
 	return (
-		<View className="flex-1 bg-mum-ink">
-			<View className="px-5 pb-3 pt-4">
-				<View className="flex-row items-center justify-between">
-					<View>
-						<Text className="text-xs font-semibold uppercase tracking-widest text-fuchsia-200/80">
-							MumTok
-						</Text>
-						<Text className="mt-1 text-xl font-bold text-white">
-							Watch and post mum tips
-						</Text>
-					</View>
-					<Pressable className="rounded-full bg-fuchsia-300/20 px-4 py-2 active:opacity-80">
-						<Text className="text-xs font-bold text-fuchsia-100">
-							+ Post Video
-						</Text>
-					</Pressable>
-				</View>
+		<View className="flex-1 bg-black" onLayout={handleLayout}>
+
+			<LinearGradient
+				colors={["#501584", "#3b1060", "#000000"]}
+				style={StyleSheet.absoluteFillObject}
+				locations={[0, 0.3, 0.7]}
+				start={{ x: 0.5, y: 0 }}
+				end={{ x: 0.5, y: 1 }}
+			/>
+
+			<View className="absolute bottom-2 w-full flex-row justify-center z-50">
+				<Pressable
+					onPress={pickVideo}
+					className="h-12 w-12 items-center justify-center rounded-full bg-fuchsia-500 shadow-lg active:scale-95"
+				>
+					<Ionicons name="add" size={30} color="white" />
+				</Pressable>
 			</View>
+
 			<ScrollView
 				pagingEnabled
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
 				showsVerticalScrollIndicator={false}
-				snapToInterval={height * 0.72}
+				snapToInterval={viewHeight}
 				decelerationRate="fast"
-				contentContainerStyle={{ paddingBottom: 24 }}
+				disableIntervalMomentum
+				contentContainerStyle={{ height: viewHeight * VIDEOS.length }}
 			>
-				{mumTipsFeed.map((item, index) => (
-					<View
-						key={item.id}
-						style={{ minHeight: height * 0.72 }}
-						className="justify-end px-5 pb-10 pt-16"
-					>
-						<View
-							className={`rounded-3xl border p-5 ${
-								index % 2 === 0
-									? "border-fuchsia-300/40 bg-fuchsia-500/20"
-									: "border-mum-purple/35 bg-mum-purple/20"
-							}`}
-						>
-							<Text className="text-xs font-semibold uppercase tracking-widest text-fuchsia-100/90">
-								{item.topic}
-							</Text>
-							<Text className="mt-3 text-lg leading-7 text-white">{item.caption}</Text>
-							<View className="mt-4 flex-row items-center gap-2">
-								<Ionicons name="flag-outline" size={18} color="#fbcfe8" />
-								<Text className="text-xs text-fuchsia-100/80">Report · moderation flag (wire up)</Text>
-							</View>
-						</View>
-					</View>
+				{VIDEOS.map((video, index) => (
+					<VideoItem
+						key={video.id}
+						video={video}
+						screenHeight={viewHeight}
+						isActive={isFocused && activeIndex === index}
+						shouldLoad={Math.abs(activeIndex - index) <= 1}
+					/>
 				))}
 			</ScrollView>
+		</View>
+	)
+}
+
+function VideoItem({
+	video,
+	screenHeight,
+	isActive,
+	shouldLoad,
+}: {
+	video: any
+	screenHeight: number
+	isActive: boolean
+	shouldLoad: boolean
+}) {
+	const [status, setStatus] = useState<string>("loading")
+	const [isUserPaused, setIsUserPaused] = useState(false)
+
+	const player = useVideoPlayer(shouldLoad ? video.source : null, (p) => {
+		p.loop = true
+	})
+
+	// Reset pause state when scrolling to a new video
+	useEffect(() => {
+		if (!isActive) {
+			setIsUserPaused(false)
+		}
+	}, [isActive])
+
+	// CORE PLAYBACK LOGIC
+	useEffect(() => {
+		if (!player) return
+
+		if (isActive && !isUserPaused && status !== "error") {
+			player.play()
+		} else {
+			player.pause()
+		}
+	}, [isActive, isUserPaused, player, status])
+
+	useEffect(() => {
+		if (!player) return
+		const sub = player.addListener(
+			"statusChange",
+			({ status: newStatus }) => {
+				setStatus(newStatus)
+			},
+		)
+		return () => sub.remove()
+	}, [player])
+
+	const togglePlay = () => {
+		if (!player || status === "error") {
+			return
+		}
+
+		if (!isUserPaused) {
+			player.pause()
+			setIsUserPaused(true)
+		} else {
+			player.play()
+			setIsUserPaused(false)
+		}
+	}
+
+	const isError = status === "error"
+
+	return (
+		<View
+			style={{ height: screenHeight }}
+			className="w-full relative"
+		>
+			<Pressable
+				onPress={togglePlay}
+				className="flex-1 overflow-hidden"
+			>
+				{!isError ? (
+					<VideoView
+						player={player}
+						style={{
+							position: "absolute",
+							bottom: 0,
+							left: 0,
+							right: 0,
+							aspectRatio: 9 / 16,
+							width: "100%",
+						}}
+						contentFit="contain"
+						nativeControls={false}
+					/>
+				) : (
+					/* 1. Video Not Found State */
+					<View className="flex-1 items-center justify-center">
+						<Ionicons
+							name="alert-circle-outline"
+							size={48}
+							color="#52525b"
+						/>
+						<Text className="mt-4 text-zinc-500 font-medium text-lg">
+							Video not found
+						</Text>
+					</View>
+				)}
+
+				{/* Loading */}
+				{(status === "loading" || status === "buffering" || !player) &&
+					shouldLoad &&
+					!isError && (
+						<View className="absolute inset-0 z-30 items-center justify-center">
+							<ActivityIndicator size="large" color="#d946ef" />
+						</View>
+					)}
+
+				{/* Play Button Overlay */}
+				{isUserPaused && status === "readyToPlay" && !isError && (
+					<View
+						pointerEvents="none"
+						className="absolute inset-0 z-20 items-center justify-center"
+					>
+						<View className="bg-black/20 p-6 rounded-full">
+							<Ionicons
+								name="play"
+								size={60}
+								color="rgba(255,255,255,0.4)"
+							/>
+						</View>
+					</View>
+				)}
+			</Pressable>
+
+			{/* Caption Overlay */}
+			{!isError && (
+				<View
+					// pointerEvents="box-none"
+					className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center"
+				>
+					<View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
+						<Text className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">
+							{video.topic}
+						</Text>
+						<Text className="mt-2 text-base font-medium leading-5 text-white">
+							{video.caption}
+						</Text>
+						<View className="mt-4 flex-row items-center gap-6">
+							<Pressable className="flex-row items-center gap-2">
+								<Ionicons
+									name="heart"
+									size={22}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									Like
+								</Text>
+							</Pressable>
+							<Pressable className="flex-row items-center gap-2">
+								<Ionicons
+									name="share-social"
+									size={22}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									Share
+								</Text>
+							</Pressable>
+						</View>
+					</View>
+				</View>
+			)}
 		</View>
 	)
 }

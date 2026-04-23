@@ -1,54 +1,55 @@
 {
-	"expo": {
-		"name": "MumAid",
-		"slug": "MumAid",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/images/icon.png",
-		"scheme": "mumaid",
-		"userInterfaceStyle": "automatic",
-		"newArchEnabled": true,
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"backgroundColor": "#ffffff",
-				"foregroundImage": "./assets/icons/mumaid-icon-no-bg-1024.png",
-				"monochromeImage": "./assets/icons/mumaid-icon-no-bg-1024.png"
-			},
-			"config": {
-				"googleMaps": {
-					"apiKey": "AIzaSyB9hABxnBhUdqbLH6n5q_5gXVDeIDlVph4"
-				}
-			},
-			"edgeToEdgeEnabled": true,
-			"predictiveBackGestureEnabled": false,
-			"package": "com.giddy10.MumAid"
-		},
-		"web": {
-			"bundler": "metro",
-			"output": "static",
-			"favicon": "./assets/images/favicon.png"
-		},
-		"plugins": [
-			"expo-router",
-			[
-				"expo-splash-screen",
-				{
-					"image": "./assets/icons/mumaid-icon-no-bg.png",
-					"imageWidth": 180,
-					"resizeMode": "contain",
-					"backgroundColor": "#ffffff",
-					"dark": {
-						"backgroundColor": "#ffffff"
-					}
-				}
-			]
-		],
-		"experiments": {
-			"typedRoutes": true,
-			"reactCompiler": true
-		}
-	}
+  "expo": {
+    "name": "MumAid",
+    "slug": "MumAid",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "mumaid",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/icons/mumaid-icon-no-bg-1024.png",
+        "monochromeImage": "./assets/icons/mumaid-icon-no-bg-1024.png"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB9hABxnBhUdqbLH6n5q_5gXVDeIDlVph4"
+        }
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.giddy10.MumAid"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icons/mumaid-icon-no-bg.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#ffffff"
+          }
+        }
+      ],
+      "expo-video"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
 }

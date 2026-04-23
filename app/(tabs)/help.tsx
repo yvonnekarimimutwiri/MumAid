@@ -1,3 +1,4 @@
+import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 import { HubLinkRow } from "@/components/HubLinkRow"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
@@ -110,6 +111,7 @@ export default function HelpHubScreen() {
 					</Link>
 				</View>
 			</ScrollView>
+			<AnimatedBreathingButton />
 		</View>
 	)
 }

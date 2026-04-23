@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
 import { useMemo, useState } from "react"
 import { Image } from "expo-image"
+import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 
 const { width } = Dimensions.get("window")
 
@@ -166,6 +167,7 @@ export default function CareHubScreen() {
 					</Link>
 				</View>
 			</ScrollView>
+			<AnimatedBreathingButton />
 		</View>
 	)
 }

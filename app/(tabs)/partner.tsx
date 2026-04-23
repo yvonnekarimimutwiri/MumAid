@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 import { TaskItem } from "@/components/TaskItem" // Same component, reusable logic
 import { Link } from "expo-router"
+import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 
 const partnerTasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
@@ -129,6 +130,7 @@ export default function PartnerScreen() {
 					</Text>
 				</View>
 			</ScrollView>
+			<AnimatedBreathingButton />
 		</View>
 	)
 }
