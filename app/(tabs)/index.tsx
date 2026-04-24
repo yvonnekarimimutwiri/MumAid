@@ -1,13 +1,18 @@
 import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 import { QuickInsightCard } from "@/components/today/QuickInsightCard"
 import { Ionicons } from "@expo/vector-icons"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useFocusEffect } from "@react-navigation/native"
+import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { Link } from "expo-router"
+import { useCallback, useState } from "react"
 import { Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 const PURPLE = "#B57EDC"
 const PURPLE_DEEP = "#6E3F9C"
+const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
 
 const quickInsights = [
 	{
@@ -38,11 +43,23 @@ const quickInsights = [
 
 export default function TodayScreen() {
 	const insets = useSafeAreaInsets()
+	const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null)
 	const now = new Date()
 	const dateLabel = now.toLocaleDateString(undefined, {
 		month: "long",
 		day: "numeric",
 	})
+
+	useFocusEffect(
+		useCallback(() => {
+			const loadProfilePhoto = async () => {
+				const savedUri = await AsyncStorage.getItem(PROFILE_PHOTO_KEY)
+				setProfilePhotoUri(savedUri)
+			}
+
+			void loadProfilePhoto()
+		}, []),
+	)
 
 	return (
 		<SafeAreaView className="flex-1 bg-mum-bg" edges={["top"]}>
@@ -53,7 +70,15 @@ export default function TodayScreen() {
 				<View className="flex-row items-center bg-mum-bg px-4 pb-3 pt-2">
 					<View className="flex-1 items-start">
 						<View className="h-10 w-10 flex items-center justify-center rounded-full border border-pink-200/50 bg-white">
-							<Text className="text-lg">💗</Text>
+							{profilePhotoUri ? (
+								<Image
+									source={{ uri: profilePhotoUri }}
+									contentFit="cover"
+									style={{ width: "100%", height: "100%" }}
+								/>
+							) : (
+								<Text className="text-lg">💗</Text>
+							)}
 						</View>
 					</View>
 					<View className="flex-1 items-center justify-center">

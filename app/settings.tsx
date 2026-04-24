@@ -1,15 +1,91 @@
 import { Ionicons } from "@expo/vector-icons"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { Image } from "expo-image"
+import * as ImagePicker from "expo-image-picker"
 import { Link } from "expo-router"
-import { useState } from "react"
-import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native"
+import { useEffect, useState } from "react"
+import {
+	Alert,
+	Pressable,
+	ScrollView,
+	Switch,
+	Text,
+	TextInput,
+	View,
+} from "react-native"
 
 export const options = { title: "Settings" }
+const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
 
 export default function SettingsScreen() {
 	const [bioLock, setBioLock] = useState(false)
+	const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null)
 	const [supportContacts, setSupportContacts] = useState([
 		{ name: "", phone: "" },
 	])
+
+	useEffect(() => {
+		const loadProfilePhoto = async () => {
+			const savedUri = await AsyncStorage.getItem(PROFILE_PHOTO_KEY)
+			if (savedUri) setProfilePhotoUri(savedUri)
+		}
+
+		void loadProfilePhoto()
+	}, [])
+
+	const saveProfilePhoto = async (uri: string) => {
+		setProfilePhotoUri(uri)
+		await AsyncStorage.setItem(PROFILE_PHOTO_KEY, uri)
+	}
+
+	const handleUploadPhoto = async () => {
+		const permission =
+			await ImagePicker.requestMediaLibraryPermissionsAsync()
+		if (!permission.granted) {
+			Alert.alert(
+				"Permission required",
+				"Please allow photo library access to upload a profile photo.",
+			)
+			return
+		}
+
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["images"],
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 0.8,
+		})
+
+		if (!result.canceled && result.assets[0]?.uri) {
+			await saveProfilePhoto(result.assets[0].uri)
+		}
+	}
+
+	const handleTakePhoto = async () => {
+		const permission = await ImagePicker.requestCameraPermissionsAsync()
+		if (!permission.granted) {
+			Alert.alert(
+				"Permission required",
+				"Please allow camera access to take a profile photo.",
+			)
+			return
+		}
+
+		const result = await ImagePicker.launchCameraAsync({
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 0.8,
+		})
+
+		if (!result.canceled && result.assets[0]?.uri) {
+			await saveProfilePhoto(result.assets[0].uri)
+		}
+	}
+
+	const handleRemovePhoto = async () => {
+		setProfilePhotoUri(null)
+		await AsyncStorage.removeItem(PROFILE_PHOTO_KEY)
+	}
 
 	const updateSupportContact = (
 		index: number,
@@ -46,6 +122,58 @@ export default function SettingsScreen() {
 				Save who to reach in emergencies and routine care. Data stays
 				on-device until you connect a backend.
 			</Text>
+
+			<View className="mb-4 rounded-2xl border border-fuchsia-200 bg-white p-4">
+				<Text className="text-sm font-semibold text-mum-ink">
+					Profile photo
+				</Text>
+				<Text className="mt-1 text-xs text-mum-ink/70">
+					Take a photo or upload one from your gallery.
+				</Text>
+				<View className="mt-3 items-center">
+					<View className="h-24 w-24 overflow-hidden rounded-full border border-mum-purple/20 bg-mum-mist">
+						{profilePhotoUri ? (
+							<Image
+								source={{ uri: profilePhotoUri }}
+								contentFit="cover"
+								style={{ width: "100%", height: "100%" }}
+							/>
+						) : (
+							<View className="h-full w-full items-center justify-center">
+								<Ionicons name="person" size={32} color="#B57EDC" />
+							</View>
+						)}
+					</View>
+				</View>
+				<View className="mt-3 flex-row flex-wrap gap-2">
+					<Pressable
+						onPress={handleTakePhoto}
+						className="rounded-full bg-mum-purpleDeep px-4 py-2 active:opacity-90"
+					>
+						<Text className="text-xs font-semibold text-white">
+							Take Photo
+						</Text>
+					</Pressable>
+					<Pressable
+						onPress={handleUploadPhoto}
+						className="rounded-full border border-mum-purpleSoft/40 px-4 py-2 active:opacity-90"
+					>
+						<Text className="text-xs font-semibold text-mum-purpleDeep">
+							Upload Photo
+						</Text>
+					</Pressable>
+					{profilePhotoUri ? (
+						<Pressable
+							onPress={handleRemovePhoto}
+							className="rounded-full border border-rose-300 px-4 py-2 active:opacity-90"
+						>
+							<Text className="text-xs font-semibold text-rose-600">
+								Remove
+							</Text>
+						</Pressable>
+					) : null}
+				</View>
+			</View>
 
 			<View className="mb-4 rounded-2xl border border-fuchsia-200 bg-white p-4">
 				<Text className="text-sm font-semibold text-mum-ink">
