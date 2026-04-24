@@ -79,7 +79,7 @@ const RITUALS = [
 
 const ALL_TIPS = [
 	"Refill her water bottle without being asked.",
-	"Take the baby and say 'I've got this for 20 mins' when she looks tired.",
+	"Take the baby and say 'I've got this' when she looks tired.",
 	"Compliment her on her personality, not just her mothering.",
 	"Bring home her favorite snack just because.",
 	"Handle the next diaper change without being asked.",

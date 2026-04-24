@@ -39,6 +39,46 @@ export default function RootLayout() {
 						name="bubble-screen"
 						options={{ headerShown: false }}
 					/>
+					<Stack.Screen
+						name="settings"
+						options={{ title: "Settings" }}
+					/>
+					<Stack.Screen
+						name="remedies"
+						options={{ title: "Remedies" }}
+					/>
+					<Stack.Screen
+						name="emergency"
+						options={{ title: "Emergency" }}
+					/>
+					<Stack.Screen
+						name="breathing-menu"
+						options={{ title: "Breathing-menu" }}
+					/>
+					<Stack.Screen
+						name="call-support"
+						options={{ title: "Call-Support" }}
+					/>
+					<Stack.Screen
+						name="opportunities"
+						options={{ title: "Opportunities" }}
+					/>
+					<Stack.Screen
+						name="exercises"
+						options={{ title: "Exercises" }}
+					/>
+					<Stack.Screen
+						name="milk"
+						options={{ title: "Milk" }}
+					/>
+					<Stack.Screen
+						name="healthcare"
+						options={{ title: "Healthcare" }}
+					/>
+					<Stack.Screen
+						name="therapist"
+						options={{ title: "Therapist" }}
+					/>
 				</Stack>
 			</SafeAreaProvider>
 		</ThemeProvider>

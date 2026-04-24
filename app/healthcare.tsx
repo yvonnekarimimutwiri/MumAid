@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons"
 import { Linking, Pressable, ScrollView, Text, View } from "react-native"
 
-export const options = { title: "Healthcare & ER" }
+export const options = { title: "Healthcare" }
 
 export default function HealthcareScreen() {
 	return (

@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { useMemo, useState } from "react"
 import { Pressable, ScrollView, Text, View } from "react-native"
 
-export const options = { title: "2‑Minute Exercises" }
+export const options = { title: "Exercises" }
 
 function exerciseMatchesQuery(
 	clip: (typeof exerciseClips)[number],

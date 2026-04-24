@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons"
 import { Linking, Pressable, Text, View } from "react-native"
 
-export const options = { title: "Call Support Person" }
+export const options = { title: "Call-Support" }
 
 export default function CallSupportScreen() {
 	return (

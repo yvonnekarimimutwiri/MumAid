@@ -3,7 +3,7 @@ import { remedyCards } from "@/lib/content"
 import { useMemo, useState } from "react"
 import { ScrollView, Text, View } from "react-native"
 
-export const options = { title: "Baby Remedies" }
+export const options = { title: "Remedies" }
 
 function remedyMatchesQuery(
 	card: (typeof remedyCards)[number],

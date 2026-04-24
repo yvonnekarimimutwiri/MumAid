@@ -3,6 +3,8 @@ import { View, Text, Pressable, TextInput, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+export const options = { title: "Breathing-menu" }
+
 type RootStackParamList = {
 	BreathingMenu: undefined
 	"bubble-screen": { durations: number[] }

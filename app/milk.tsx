@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import { Pressable, ScrollView, Text, View } from "react-native"
 
-export const options = { title: "Milk Support" }
+export const options = { title: "Milk" }
 
 export default function MilkScreen() {
 	const router = useRouter()
