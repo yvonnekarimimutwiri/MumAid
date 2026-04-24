@@ -8,35 +8,35 @@ import { setStatusBarStyle } from "expo-status-bar"
 import { useVideoPlayer, VideoView } from "expo-video"
 import { useCallback, useEffect, useState } from "react"
 import {
-    ActivityIndicator,
-    Dimensions,
-    LayoutChangeEvent,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+	ActivityIndicator,
+	Dimensions,
+	Image,
+	LayoutChangeEvent,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
+	Platform,
+	Pressable,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
 } from "react-native"
 
 export default function FeedScreen() {
-    const [viewHeight, setViewHeight] = useState(
-        Dimensions.get("window").height,
-    )
-    const [isVideoReady, setIsVideoReady] = useState(false)
-    const [activeIndex, setActiveIndex] = useState(0)
-    const isFocused = useIsFocused()
+	const [viewHeight, setViewHeight] = useState(
+		Dimensions.get("window").height,
+	)
+	const [isVideoReady, setIsVideoReady] = useState(false)
+	const [activeIndex, setActiveIndex] = useState(0)
+	const isFocused = useIsFocused()
 
-    const navigation = useNavigation()
-    
+	const navigation = useNavigation()
 
-    useFocusEffect(
-        useCallback(() => {
-            setStatusBarStyle("light")
+	useFocusEffect(
+		useCallback(() => {
+			setStatusBarStyle("light")
 
-            navigation?.setOptions({
+			navigation?.setOptions({
 				tabBarStyle: {
 					backgroundColor: "#000000",
 					borderTopColor: "rgba(0,0,0,0)",
@@ -48,47 +48,47 @@ export default function FeedScreen() {
 				tabBarInactiveTintColor: "#ffffff",
 			})
 
-            return () => {
-                setStatusBarStyle("dark")
+			return () => {
+				setStatusBarStyle("dark")
 
-                navigation?.setOptions({
-                    tabBarStyle: {
-                        backgroundColor: "#fefbfd",
-                        borderTopColor: "#f1f5f9",
-                    },
-                    tabBarActiveTintColor: "#6E3F9C",
-                                    tabBarInactiveTintColor:
-                                        Platform.OS === "ios" ? "#000000" : "#52637a",
-                })
-            }
-        }, [navigation]),
-    )
+				navigation?.setOptions({
+					tabBarStyle: {
+						backgroundColor: "#fefbfd",
+						borderTopColor: "#f1f5f9",
+					},
+					tabBarActiveTintColor: "#6E3F9C",
+					tabBarInactiveTintColor:
+						Platform.OS === "ios" ? "#000000" : "#52637a",
+				})
+			}
+		}, [navigation]),
+	)
 
-    const handleLayout = (event: LayoutChangeEvent) => {
-        setViewHeight(event.nativeEvent.layout.height)
-    }
+	const handleLayout = (event: LayoutChangeEvent) => {
+		setViewHeight(event.nativeEvent.layout.height)
+	}
 
-    const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const yOffset = event.nativeEvent.contentOffset.y
-        const index = Math.round(yOffset / viewHeight)
-        if (index !== activeIndex) {
-            setActiveIndex(index)
-            setIsVideoReady(false)
-        }
-    }
+	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const yOffset = event.nativeEvent.contentOffset.y
+		const index = Math.round(yOffset / viewHeight)
+		if (index !== activeIndex) {
+			setActiveIndex(index)
+			setIsVideoReady(false)
+		}
+	}
 
-    const pickVideo = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["videos"],
-            allowsEditing: true,
-            quality: 1,
-        })
-        if (!result.canceled) {
-            console.log("Selected video:", result.assets[0].uri)
-        }
-    }
+	const pickVideo = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ["videos"],
+			allowsEditing: true,
+			quality: 1,
+		})
+		if (!result.canceled) {
+			console.log("Selected video:", result.assets[0].uri)
+		}
+	}
 
-    return (
+	return (
 		<View className="flex-1 bg-black" onLayout={handleLayout}>
 			<LinearGradient
 				colors={
@@ -139,175 +139,174 @@ export default function FeedScreen() {
 }
 
 function VideoItem({
-    video,
-    screenHeight,
-    isActive,
-    shouldLoad,
-    onLoad,
+	video,
+	screenHeight,
+	isActive,
+	shouldLoad,
+	onLoad,
 }: {
-    video: any
-    screenHeight: number
-    isActive: boolean
-    shouldLoad: boolean
-    onLoad: () => void
+	video: any
+	screenHeight: number
+	isActive: boolean
+	shouldLoad: boolean
+	onLoad: () => void
 }) {
-    const [status, setStatus] = useState<string>("loading")
-    const [isUserPaused, setIsUserPaused] = useState(false)
+	const [status, setStatus] = useState<string>("loading")
+	const [isUserPaused, setIsUserPaused] = useState(false)
 
-    const player = useVideoPlayer(shouldLoad ? video.source : null, (p) => {
-        p.loop = true
-    })
+	const player = useVideoPlayer(shouldLoad ? video.source : null, (p) => {
+		p.loop = true
+	})
 
-    // Reset pause state when scrolling to a new video
-    useEffect(() => {
-        if (!isActive) {
-            setIsUserPaused(false)
-        }
-    }, [isActive])
+	// Reset pause state when scrolling to a new video
+	useEffect(() => {
+		if (!isActive) {
+			setIsUserPaused(false)
+		}
+	}, [isActive])
 
-    // CORE PLAYBACK LOGIC
-    useEffect(() => {
-        if (!player) return
+	// CORE PLAYBACK LOGIC
+	useEffect(() => {
+		if (!player) return
 
-        if (isActive && !isUserPaused && status !== "error") {
-            player.play()
-        } else {
-            player.pause()
-        }
-    }, [isActive, isUserPaused, player, status])
+		if (isActive && !isUserPaused && status !== "error") {
+			player.play()
+		} else {
+			player.pause()
+		}
+	}, [isActive, isUserPaused, player, status])
 
-    useEffect(() => {
-        if (!player) return
-        const sub = player.addListener(
-            "statusChange",
-            ({ status: newStatus }) => {
-                setStatus(newStatus)
-                if (newStatus === "readyToPlay") {
+	useEffect(() => {
+		if (!player) return
+		const sub = player.addListener(
+			"statusChange",
+			({ status: newStatus }) => {
+				setStatus(newStatus)
+				if (newStatus === "readyToPlay") {
 					onLoad()
 				}
-            },
-        )
-        return () => sub.remove()
-    }, [player, isActive, onLoad])
+			},
+		)
+		return () => sub.remove()
+	}, [player, isActive, onLoad])
 
-    useEffect(() => {
+	useEffect(() => {
 		if (isActive && status === "readyToPlay") {
 			onLoad()
 		}
 	}, [isActive, status, onLoad])
 
-    const togglePlay = () => {
-        if (!player || status === "error") {
-            return
-        }
+	const togglePlay = () => {
+		if (!player || status === "error") {
+			return
+		}
 
-        if (!isUserPaused) {
-            player.pause()
-            setIsUserPaused(true)
-        } else {
-            player.play()
-            setIsUserPaused(false)
-        }
-    }
+		if (!isUserPaused) {
+			player.pause()
+			setIsUserPaused(true)
+		} else {
+			player.play()
+			setIsUserPaused(false)
+		}
+	}
 
-    const isError = status === "error"
+	const isError = status === "error"
 
-    return (
-        <View style={{ height: screenHeight }} className="w-full relative">
-            <Pressable onPress={togglePlay} className="flex-1 overflow-hidden">
-                {!isError ? (
-                    <VideoView
-                        player={player}
-                        style={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            // aspectRatio: 9 / 16,
-                            height: "100%",
-                            width: "100%",
-                        }}
-                        contentFit="contain"
-                        nativeControls={false}
-                    />
-                ) : (
-                    /* 1. Video Not Found State */
-                    <View className="flex-1 items-center justify-center">
-                        <Ionicons
-                            name="alert-circle-outline"
-                            size={48}
-                            color="#52525b"
-                        />
-                        <Text className="mt-4 text-zinc-500 font-medium text-lg">
-                            Video not found
-                        </Text>
-                    </View>
-                )}
+	return (
+		<View style={{ height: screenHeight }} className="w-full relative">
+			<Pressable onPress={togglePlay} className="flex-1 overflow-hidden">
+				{!isError ? (
+					<VideoView
+						player={player}
+						style={{
+							position: "absolute",
+							bottom: 0,
+							left: 0,
+							right: 0,
+							// aspectRatio: 9 / 16,
+							height: "100%",
+							width: "100%",
+						}}
+						contentFit="contain"
+						nativeControls={false}
+					/>
+				) : (
+					<View className="flex-1 items-center justify-center">
+						<Image
+							source={require("@/assets/icons/mumaid-icon-no-bg.png")}
+							style={{ width: 120, height: 120 }}
+							resizeMode="contain"
+						/>
+						<Text className="mt-4 text-zinc-500 font-medium text-lg">
+							Video not found
+						</Text>
+					</View>
+				)}
 
-                {/* Loading */}
-                {(status === "loading" || status === "buffering" || !player) &&
-                    shouldLoad &&
-                    !isError && (
-                        <View className="absolute inset-0 z-30 items-center justify-center">
-                            <ActivityIndicator size="large" color="#d946ef" />
-                        </View>
-                    )}
+				{/* Loading */}
+				{(status === "loading" || status === "buffering" || !player) &&
+					shouldLoad &&
+					!isError && (
+						<View className="absolute inset-0 z-30 items-center justify-center">
+							<ActivityIndicator size="large" color="#d946ef" />
+						</View>
+					)}
 
-                {/* Play Button Overlay */}
-                {isUserPaused && status === "readyToPlay" && !isError && (
-                    <View
-                        pointerEvents="none"
-                        className="absolute inset-0 z-20 items-center justify-center"
-                    >
-                        <View className="bg-black/20 p-6 rounded-full">
-                            <Ionicons
-                                name="play"
-                                size={60}
-                                color="rgba(255,255,255,0.4)"
-                            />
-                        </View>
-                    </View>
-                )}
-            </Pressable>
+				{/* Play Button Overlay */}
+				{isUserPaused && status === "readyToPlay" && !isError && (
+					<View
+						pointerEvents="none"
+						className="absolute inset-0 z-20 items-center justify-center"
+					>
+						<View className="bg-black/20 p-6 rounded-full">
+							<Ionicons
+								name="play"
+								size={60}
+								color="rgba(255,255,255,0.4)"
+							/>
+						</View>
+					</View>
+				)}
+			</Pressable>
 
-            {/* Caption Overlay */}
-            {!isError && (
-                <View
-                    // pointerEvents="box-none"
-                    className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center"
-                >
-                    <View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
-                        <Text className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">
-                            {video.topic}
-                        </Text>
-                        <Text className="mt-2 text-base font-medium leading-5 text-white">
-                            {video.caption}
-                        </Text>
-                        <View className="mt-4 flex-row items-center gap-6">
-                            <Pressable className="flex-row items-center gap-2">
-                                <Ionicons
-                                    name="heart"
-                                    size={22}
-                                    color="white"
-                                />
-                                <Text className="text-white text-xs font-semibold">
-                                    Like
-                                </Text>
-                            </Pressable>
-                            <Pressable className="flex-row items-center gap-2">
-                                <Ionicons
-                                    name="share-social"
-                                    size={22}
-                                    color="white"
-                                />
-                                <Text className="text-white text-xs font-semibold">
-                                    Share
-                                </Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                </View>
-            )}
-        </View>
-    )
+			{/* Caption Overlay */}
+			{!isError && (
+				<View
+					// pointerEvents="box-none"
+					className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center"
+				>
+					<View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
+						<Text className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">
+							{video.topic}
+						</Text>
+						<Text className="mt-2 text-base font-medium leading-5 text-white">
+							{video.caption}
+						</Text>
+						<View className="mt-4 flex-row items-center gap-6">
+							<Pressable className="flex-row items-center gap-2">
+								<Ionicons
+									name="heart"
+									size={22}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									Like
+								</Text>
+							</Pressable>
+							<Pressable className="flex-row items-center gap-2">
+								<Ionicons
+									name="share-social"
+									size={22}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									Share
+								</Text>
+							</Pressable>
+						</View>
+					</View>
+				</View>
+			)}
+		</View>
+	)
 }
