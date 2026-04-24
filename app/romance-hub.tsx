@@ -167,15 +167,29 @@ export default function RomanceHubScreen() {
 												width: ITEM_WIDTH,
 												marginRight: ITEM_SPACING,
 												elevation: isTarget ? 12 : 0,
+												backgroundColor: isTarget
+													? "#6E3F9C"
+													: "#FFFFFF",
+												borderColor: isTarget
+													? "#FFFFFF"
+													: "#FCDCEA",
+												transform: [
+													{
+														scale: isTarget
+															? 1.05
+															: 1,
+													},
+												],
 											}}
-											className={`h-[180px] rounded-[32px] p-6 justify-between border-2 ${
-												isTarget
-													? "bg-mum-purpleDeep border-white scale-105"
-													: "bg-white border-mum-petal"
-											}`}
+											className="h-[180px] rounded-[32px] p-6 justify-between border-2"
 										>
 											<View
-												className={`h-10 w-10 items-center justify-center rounded-xl ${isTarget ? "bg-white/20" : "bg-mum-mist"}`}
+												style={{
+													backgroundColor: isTarget
+														? "rgba(255,255,255,0.2)"
+														: "#F5ECFA",
+												}}
+												className="h-10 w-10 items-center justify-center rounded-xl"
 											>
 												<Ionicons
 													name={item.icon as any}
@@ -211,8 +225,13 @@ export default function RomanceHubScreen() {
 						<Pressable
 							onPress={spinPicker}
 							disabled={isSpinning}
-							style={{ elevation: 6 }}
-							className={`rounded-full py-4 active:opacity-90 ${isSpinning ? "bg-mum-petal" : "bg-mum-purpleDeep"}`}
+							style={{
+								elevation: 6,
+								backgroundColor: isSpinning
+									? "#EC4899"
+									: "#6E3F9C",
+							}}
+							className="rounded-full py-4 active:opacity-90"
 						>
 							<Text className="text-center font-bold text-white uppercase tracking-widest">
 								{isSpinning

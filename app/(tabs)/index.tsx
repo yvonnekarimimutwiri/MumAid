@@ -6,7 +6,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { Link } from "expo-router"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
@@ -44,11 +44,19 @@ const quickInsights = [
 export default function TodayScreen() {
 	const insets = useSafeAreaInsets()
 	const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null)
-	const now = new Date()
-	const dateLabel = now.toLocaleDateString(undefined, {
+	const [selectedDate, setSelectedDate] = useState(new Date())
+	const [calendarVisible, setCalendarVisible] = useState(false)
+	const [displayedMonth, setDisplayedMonth] = useState(
+		new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1),
+	)
+	const dateLabel = selectedDate.toLocaleDateString(undefined, {
 		month: "long",
 		day: "numeric",
 	})
+	const calendarDays = useMemo(
+		() => buildCalendarDays(displayedMonth),
+		[displayedMonth],
+	)
 
 	useFocusEffect(
 		useCallback(() => {
@@ -90,7 +98,7 @@ export default function TodayScreen() {
 						<Pressable
 							accessibilityLabel="Calendar"
 							className="h-10 w-10 items-center justify-center rounded-full active:bg-white/60"
-							onPress={() => {}}
+							onPress={() => setCalendarVisible(true)}
 						>
 							<Ionicons
 								name="calendar-outline"
@@ -240,6 +248,144 @@ export default function TodayScreen() {
 				</View>
 			</ScrollView>
 			<AnimatedBreathingButton />
+			{calendarVisible ? (
+				<View className="absolute inset-0 justify-center bg-black/35 px-6">
+					<Pressable
+						className="absolute inset-0"
+						onPress={() => setCalendarVisible(false)}
+					/>
+					<View className="rounded-3xl bg-white p-5">
+						<View className="mb-4 flex-row items-center justify-between">
+							<Pressable
+								onPress={() => {
+									setDisplayedMonth(
+										new Date(
+											displayedMonth.getFullYear(),
+											displayedMonth.getMonth() - 1,
+											1,
+										),
+									)
+								}}
+								className="h-9 w-9 items-center justify-center rounded-full bg-mum-mist"
+							>
+								<Ionicons
+									name="chevron-back"
+									size={18}
+									color="#2D1643"
+								/>
+							</Pressable>
+							<Text className="text-base font-bold text-mum-ink">
+								{displayedMonth.toLocaleDateString(undefined, {
+									month: "long",
+									year: "numeric",
+								})}
+							</Text>
+							<Pressable
+								onPress={() => {
+									setDisplayedMonth(
+										new Date(
+											displayedMonth.getFullYear(),
+											displayedMonth.getMonth() + 1,
+											1,
+										),
+									)
+								}}
+								className="h-9 w-9 items-center justify-center rounded-full bg-mum-mist"
+							>
+								<Ionicons
+									name="chevron-forward"
+									size={18}
+									color="#2D1643"
+								/>
+							</Pressable>
+						</View>
+						<View className="mb-2 flex-row">
+							{["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(
+								(day) => (
+									<Text
+										key={day}
+										className="flex-1 text-center text-xs font-semibold text-mum-ink/50"
+									>
+										{day}
+									</Text>
+								),
+							)}
+						</View>
+						{Array.from({ length: Math.ceil(calendarDays.length / 7) }).map(
+							(_, rowIndex) => (
+								<View key={`row-${rowIndex}`} className="mb-1 flex-row">
+									{calendarDays
+										.slice(rowIndex * 7, rowIndex * 7 + 7)
+										.map((cell, cellIndex) => {
+											const isSelected =
+												cell !== null &&
+												isSameDay(cell, selectedDate)
+											return (
+												<Pressable
+													key={
+														cell
+															? cell.toISOString()
+															: `empty-${rowIndex}-${cellIndex}`
+													}
+													disabled={cell === null}
+													onPress={() => {
+														if (!cell) return
+														setSelectedDate(cell)
+														setDisplayedMonth(
+															new Date(
+																cell.getFullYear(),
+																cell.getMonth(),
+																1,
+															),
+														)
+														setCalendarVisible(false)
+													}}
+													className={`h-10 flex-1 items-center justify-center rounded-xl ${isSelected ? "bg-mum-purpleDeep" : ""}`}
+												>
+													<Text
+														className={`text-sm ${isSelected ? "font-semibold text-white" : "text-mum-ink"}`}
+													>
+														{cell ? cell.getDate() : ""}
+													</Text>
+												</Pressable>
+											)
+										})}
+								</View>
+							),
+						)}
+					</View>
+				</View>
+			) : null}
 		</SafeAreaView>
+	)
+}
+
+function buildCalendarDays(month: Date): Array<Date | null> {
+	const year = month.getFullYear()
+	const monthIndex = month.getMonth()
+	const firstDayOfWeek = new Date(year, monthIndex, 1).getDay()
+	const daysInMonth = new Date(year, monthIndex + 1, 0).getDate()
+	const cells: Array<Date | null> = []
+
+	for (let i = 0; i < firstDayOfWeek; i += 1) {
+		cells.push(null)
+	}
+
+	for (let day = 1; day <= daysInMonth; day += 1) {
+		cells.push(new Date(year, monthIndex, day))
+	}
+
+	while (cells.length % 7 !== 0) {
+		cells.push(null)
+	}
+
+	return cells
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+	return (
+		a.getFullYear() === b.getFullYear() &&
+		a.getMonth() === b.getMonth() &&
+		a.getDate() === b.getDate()
 	)
 }
