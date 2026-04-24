@@ -214,7 +214,7 @@ function VideoItem({
 
 	return (
 		<View style={{ height: screenHeight }} className="w-full relative">
-			<Pressable onPress={togglePlay} className="flex-1 overflow-hidden">
+			<View style={StyleSheet.absoluteFill} className="overflow-hidden">
 				{!isError ? (
 					<VideoView
 						player={player}
@@ -242,6 +242,28 @@ function VideoItem({
 						</Text>
 					</View>
 				)}
+			</View>
+
+			<Pressable
+				onPress={togglePlay}
+				style={StyleSheet.absoluteFill}
+				className="z-30 justify-center items-center"
+			>
+				{/* Play Button Overlay */}
+				{isUserPaused && status === "readyToPlay" && !isError && (
+					<View
+						pointerEvents="none"
+						className="absolute inset-0 z-20 items-center justify-center"
+					>
+						<View className="bg-black/40 p-6 rounded-full">
+							<Ionicons
+								name="play"
+								size={60}
+								color="rgba(255,255,255,0.6)"
+							/>
+						</View>
+					</View>
+				)}
 
 				{/* Loading */}
 				{(status === "loading" || status === "buffering" || !player) &&
@@ -251,31 +273,15 @@ function VideoItem({
 							<ActivityIndicator size="large" color="#d946ef" />
 						</View>
 					)}
-
-				{/* Play Button Overlay */}
-				{isUserPaused && status === "readyToPlay" && !isError && (
-					<View
-						pointerEvents="none"
-						className="absolute inset-0 z-20 items-center justify-center"
-					>
-						<View className="bg-black/20 p-6 rounded-full">
-							<Ionicons
-								name="play"
-								size={60}
-								color="rgba(255,255,255,0.4)"
-							/>
-						</View>
-					</View>
-				)}
 			</Pressable>
 
 			{/* Caption Overlay */}
 			{!isError && (
 				<View
 					// pointerEvents="box-none"
-					className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center"
+					className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center z-50"
 				>
-					<View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
+					<View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4">
 						<Text className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">
 							{video.topic}
 						</Text>
@@ -283,7 +289,10 @@ function VideoItem({
 							{video.caption}
 						</Text>
 						<View className="mt-4 flex-row items-center gap-6">
-							<Pressable className="flex-row items-center gap-2">
+							<Pressable
+								onPress={() => console.log("Like")}
+								className="flex-row items-center gap-2"
+							>
 								<Ionicons
 									name="heart"
 									size={22}
@@ -293,7 +302,10 @@ function VideoItem({
 									Like
 								</Text>
 							</Pressable>
-							<Pressable className="flex-row items-center gap-2">
+							<Pressable
+								onPress={() => console.log("Share")}
+								className="flex-row items-center gap-2"
+							>
 								<Ionicons
 									name="share-social"
 									size={22}

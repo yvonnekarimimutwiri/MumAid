@@ -18,6 +18,8 @@ export default function PartnerScreen() {
 	const [isModalVisible, setIsModalVisible] = useState(false)
 	const [customText, setCustomText] = useState("")
 
+	const isSendDisabled = customText.trim().length === 0
+
 	const insets = useSafeAreaInsets()
 
 	return (
@@ -160,12 +162,18 @@ export default function PartnerScreen() {
 									</Pressable>
 
 									<Pressable
+										disabled={isSendDisabled}
 										onPress={() => {
 											console.log("Sending:", customText)
 											setIsModalVisible(false)
 											setCustomText("")
 										}}
-										className="bg-mum-purpleDeep px-8 py-3 rounded-xl shadow-sm active:opacity-90"
+										style={{ elevation: 3 }}
+										className={`px-8 py-3 rounded-xl ${
+											isSendDisabled
+												? "bg-slate-200"
+												: "bg-mum-purpleDeep active:opacity-90"
+										}`}
 									>
 										<Text className="text-white font-bold">
 											Send
