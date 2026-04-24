@@ -25,6 +25,7 @@ export default function FeedScreen() {
     const [viewHeight, setViewHeight] = useState(
         Dimensions.get("window").height,
     )
+    const [isVideoReady, setIsVideoReady] = useState(false)
     const [activeIndex, setActiveIndex] = useState(0)
     const isFocused = useIsFocused()
 
@@ -38,7 +39,7 @@ export default function FeedScreen() {
             navigation?.setOptions({
 				tabBarStyle: {
 					backgroundColor: "#000000",
-					borderTopColor: "rgba(255,255,255,0)",
+					borderTopColor: "rgba(0,0,0,0)",
 					height: 88,
 					paddingBottom: 28,
 					paddingTop: 12,
@@ -72,6 +73,7 @@ export default function FeedScreen() {
         const index = Math.round(yOffset / viewHeight)
         if (index !== activeIndex) {
             setActiveIndex(index)
+            setIsVideoReady(false)
         }
     }
 
@@ -87,46 +89,53 @@ export default function FeedScreen() {
     }
 
     return (
-        <View className="flex-1 bg-black" onLayout={handleLayout}>
-            <LinearGradient
-                colors={["#501584", "#3b1060", "#000000"]}
-                style={StyleSheet.absoluteFillObject}
-                locations={[0, 0.3, 0.7]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-            />
+		<View className="flex-1 bg-black" onLayout={handleLayout}>
+			<LinearGradient
+				colors={
+					isVideoReady
+						? ["#000000", "#000000", "#000000"]
+						: ["#501584", "#3b1060", "#000000"]
+				}
+				style={StyleSheet.absoluteFillObject}
+				locations={[0, 0.3, 0.7]}
+				start={{ x: 0.5, y: 0 }}
+				end={{ x: 0.5, y: 1 }}
+			/>
 
-            <View className="absolute top-12 left-auto right-[12px] z-50">
-                <Pressable
-                    onPress={pickVideo}
-                    className="h-12 w-12 items-center justify-center rounded-full bg-fuchsia-500 shadow-lg active:scale-95"
-                >
-                    <Ionicons name="add" size={30} color="white" />
-                </Pressable>
-            </View>
+			<View className="absolute top-12 left-auto right-[12px] z-50">
+				<Pressable
+					onPress={pickVideo}
+					className="h-12 w-12 items-center justify-center rounded-full bg-fuchsia-500 shadow-lg active:scale-95"
+				>
+					<Ionicons name="add" size={30} color="white" />
+				</Pressable>
+			</View>
 
-            <ScrollView
-                pagingEnabled
-                onScroll={handleScroll}
-                scrollEventThrottle={16}
-                showsVerticalScrollIndicator={false}
-                snapToInterval={viewHeight}
-                decelerationRate="fast"
-                disableIntervalMomentum
-                contentContainerStyle={{ height: viewHeight * VIDEOS.length }}
-            >
-                {VIDEOS.map((video, index) => (
-                    <VideoItem
-                        key={video.id}
-                        video={video}
-                        screenHeight={viewHeight}
-                        isActive={isFocused && activeIndex === index}
-                        shouldLoad={Math.abs(activeIndex - index) <= 1}
-                    />
-                ))}
-            </ScrollView>
-        </View>
-    )
+			<ScrollView
+				pagingEnabled
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
+				showsVerticalScrollIndicator={false}
+				snapToInterval={viewHeight}
+				decelerationRate="fast"
+				disableIntervalMomentum
+				contentContainerStyle={{ height: viewHeight * VIDEOS.length }}
+			>
+				{VIDEOS.map((video, index) => (
+					<VideoItem
+						key={video.id}
+						video={video}
+						screenHeight={viewHeight}
+						isActive={isFocused && activeIndex === index}
+						shouldLoad={Math.abs(activeIndex - index) <= 1}
+						onLoad={() => {
+							if (activeIndex === index) setIsVideoReady(true)
+						}}
+					/>
+				))}
+			</ScrollView>
+		</View>
+	)
 }
 
 function VideoItem({
@@ -134,11 +143,13 @@ function VideoItem({
     screenHeight,
     isActive,
     shouldLoad,
+    onLoad,
 }: {
     video: any
     screenHeight: number
     isActive: boolean
     shouldLoad: boolean
+    onLoad: () => void
 }) {
     const [status, setStatus] = useState<string>("loading")
     const [isUserPaused, setIsUserPaused] = useState(false)
@@ -171,10 +182,19 @@ function VideoItem({
             "statusChange",
             ({ status: newStatus }) => {
                 setStatus(newStatus)
+                if (newStatus === "readyToPlay") {
+					onLoad()
+				}
             },
         )
         return () => sub.remove()
-    }, [player])
+    }, [player, isActive, onLoad])
+
+    useEffect(() => {
+		if (isActive && status === "readyToPlay") {
+			onLoad()
+		}
+	}, [isActive, status, onLoad])
 
     const togglePlay = () => {
         if (!player || status === "error") {
