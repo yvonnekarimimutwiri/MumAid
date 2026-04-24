@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons"
-import { ScrollView, Text, View, Pressable } from "react-native"
+import { ScrollView, Text, View, Pressable, Modal, KeyboardAvoidingView, Platform, TextInput } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 import { TaskItem } from "@/components/TaskItem" // Same component, reusable logic
 import { Link } from "expo-router"
 import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
+import { useState } from "react"
 
 const partnerTasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
@@ -14,6 +15,9 @@ const partnerTasks = [
 ]
 
 export default function PartnerScreen() {
+	const [isModalVisible, setIsModalVisible] = useState(false)
+	const [customText, setCustomText] = useState("")
+
 	const insets = useSafeAreaInsets()
 
 	return (
@@ -51,7 +55,8 @@ export default function PartnerScreen() {
 								Invite your partner
 							</Text>
 							<Text className="text-sm text-mum-ink/50">
-								Send an invite so your partner can support tasks in real time.
+								Send an invite so your partner can support tasks
+								in real time.
 							</Text>
 						</View>
 					</View>
@@ -79,7 +84,8 @@ export default function PartnerScreen() {
 							color="#6E3F9C"
 						/>
 						<Text className="text-xs text-mum-ink/50">
-							Once accepted, your partner gets their support dashboard.
+							Once accepted, your partner gets their support
+							dashboard.
 						</Text>
 					</View>
 				</LinearGradient>
@@ -99,13 +105,77 @@ export default function PartnerScreen() {
 							icon="archive"
 						/>
 						<QuickRequestChip label="Meal prep" icon="restaurant" />
-						<Pressable className="h-10 items-center justify-center rounded-2xl bg-mum-mist px-4 border border-mum-purpleSoft/30">
+						<Pressable
+							onPress={() => setIsModalVisible(true)}
+							className="h-10 items-center justify-center rounded-2xl bg-mum-mist px-4 border border-mum-purpleSoft/30"
+						>
 							<Text className="text-xs font-bold text-mum-purpleDeep">
 								+ Custom
 							</Text>
 						</Pressable>
 					</View>
 				</View>
+
+				<Modal
+					animationType="fade"
+					transparent={true}
+					visible={isModalVisible}
+					onRequestClose={() => setIsModalVisible(false)}
+				>
+					<Pressable
+						className="flex-1 bg-black/40 justify-center px-6"
+						onPress={() => setIsModalVisible(false)}
+					>
+						<KeyboardAvoidingView
+							behavior={
+								Platform.OS === "ios" ? "padding" : "height"
+							}
+						>
+							<Pressable
+								onPress={(e) => e.stopPropagation()}
+								className="bg-white rounded-3xl p-6 shadow-xl border border-pink-100"
+							>
+								<Text className="text-lg font-bold text-mum-ink mb-4">
+									Custom Request
+								</Text>
+
+								<TextInput
+									placeholder="What do you need help with?"
+									placeholderTextColor="#94a3b8"
+									className="bg-slate-50 rounded-2xl p-4 text-mum-ink text-base border border-slate-100"
+									autoFocus={true}
+									value={customText}
+									onChangeText={setCustomText}
+									multiline
+								/>
+
+								<View className="flex-row justify-end gap-3 mt-6">
+									<Pressable
+										onPress={() => setIsModalVisible(false)}
+										className="px-5 py-3 rounded-xl"
+									>
+										<Text className="text-slate-500 font-semibold">
+											Cancel
+										</Text>
+									</Pressable>
+
+									<Pressable
+										onPress={() => {
+											console.log("Sending:", customText)
+											setIsModalVisible(false)
+											setCustomText("")
+										}}
+										className="bg-mum-purpleDeep px-8 py-3 rounded-xl shadow-sm active:opacity-90"
+									>
+										<Text className="text-white font-bold">
+											Send
+										</Text>
+									</Pressable>
+								</View>
+							</Pressable>
+						</KeyboardAvoidingView>
+					</Pressable>
+				</Modal>
 
 				<View className="flex-row items-center justify-between mb-4 px-1">
 					<Text className="text-sm font-bold uppercase tracking-widest text-mum-ink/40">
@@ -125,8 +195,8 @@ export default function PartnerScreen() {
 				<View className="mt-6 items-center px-4">
 					<Ionicons name="heart" size={24} color="#db2777" />
 					<Text className="mt-2 text-center text-xs italic text-mum-ink/40 leading-5">
-						"Coming together is a beginning; keeping together is
-						progress; working together is success."
+						"Coming together is a beginning. Keeping together is
+						progress. Working together is success."
 					</Text>
 				</View>
 			</ScrollView>
