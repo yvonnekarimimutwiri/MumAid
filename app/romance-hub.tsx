@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
 	Animated,
 	Dimensions,
@@ -90,6 +90,19 @@ export default function RomanceHubScreen() {
 	const scrollX = useRef(new Animated.Value(0)).current
 	const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 	const [isSpinning, setIsSpinning] = useState(false)
+	const [dots, setDots] = useState("")
+
+	useEffect(() => {
+		let interval: ReturnType<typeof setInterval>
+		if (isSpinning) {
+			interval = setInterval(() => {
+				setDots((prev) => (prev.length < 3 ? prev + "." : ""))
+			}, 400)
+		} else {
+			setDots("")
+		}
+		return () => clearInterval(interval)
+	}, [isSpinning])
 
 	const [dailyRitual] = useState(
 		RITUALS[Math.floor(Math.random() * RITUALS.length)],
@@ -115,8 +128,8 @@ export default function RomanceHubScreen() {
 		Animated.timing(scrollX, {
 			toValue: -targetOffset + (width / 2 - ITEM_WIDTH / 2 - 20),
 			duration: 5000,
-			easing: Easing.out(Easing.bezier(0.22, 1, 0.36, 1)),
-			useNativeDriver: false,
+			easing: Easing.bezier(0.15, 0, 0, 1),
+			useNativeDriver: true,
 		}).start(() => {
 			setSelectedIndex(finalLanding)
 			setIsSpinning(false)
@@ -147,7 +160,7 @@ export default function RomanceHubScreen() {
 					</View>
 
 					<View className="relative h-[220px] overflow-hidden">
-						<View className="absolute left-1/2 z-10 h-full w-1 -translate-x-0.5 bg-mum-purpleDeep/10" />
+						{isSpinning && <View style={{opacity: .5}} className="absolute left-1/2 z-10 h-full w-1 -translate-x-0.5 bg-mum-purpleDeep"></View>}
 
 						<Animated.View
 							style={{
@@ -166,22 +179,22 @@ export default function RomanceHubScreen() {
 											style={{
 												width: ITEM_WIDTH,
 												marginRight: ITEM_SPACING,
-												elevation: isTarget ? 12 : 0,
+												elevation: isTarget ? 9 : 3,
 												backgroundColor: isTarget
 													? "#6E3F9C"
 													: "#FFFFFF",
 												borderColor: isTarget
-													? "#FFFFFF"
+													? "#FFFFFF00"
 													: "#FCDCEA",
 												transform: [
 													{
 														scale: isTarget
-															? 1.05
-															: 1,
+															? 1
+															: 0.85,
 													},
 												],
 											}}
-											className="h-[180px] rounded-[32px] p-6 justify-between border-2"
+											className="duration-200 h-[180px] rounded-[32px] p-6 justify-between border-2"
 										>
 											<View
 												style={{
@@ -226,18 +239,42 @@ export default function RomanceHubScreen() {
 							onPress={spinPicker}
 							disabled={isSpinning}
 							style={{
-								elevation: 6,
+								elevation: isSpinning ? 0 : 6,
 								backgroundColor: isSpinning
-									? "#EC4899"
+									? "#EC489900"
 									: "#6E3F9C",
 							}}
-							className="rounded-full py-4 active:opacity-90"
+							className="rounded-full py-4 active:opacity-90 flex-row justify-center items-center"
 						>
-							<Text className="text-center font-bold text-white uppercase tracking-widest">
-								{isSpinning
-									? "Choosing..."
-									: "Spin for Date Idea"}
+							{/* Left spacer to offset the dots on the right and keep the word centered */}
+							{isSpinning && <View style={{ width: 24 }} />}
+
+							<Text
+								className={`font-bold ${isSpinning ? "text-black" : "text-white"} uppercase tracking-widest text-center`}
+							>
+								{isSpinning ? "Choosing" : "Spin for Date Idea"}
 							</Text>
+
+							{isSpinning && (
+								<View style={{ width: 24, marginLeft: 2 }}>
+									<Text
+										style={{ opacity: 0 }}
+										className="font-bold tracking-widest"
+									>
+										...
+									</Text>
+
+									<Text
+										className="font-bold tracking-widest position-absolute"
+										style={{
+											position: "absolute",
+											left: 0,
+										}}
+									>
+										{dots}
+									</Text>
+								</View>
+							)}
 						</Pressable>
 					</View>
 				</View>
