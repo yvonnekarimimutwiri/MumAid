@@ -106,7 +106,7 @@ export default function RomanceHubScreen() {
 		scrollX.setValue(0)
 
 		const totalItems = DATE_IDEAS.length
-		const spins = 1
+		const spins = 2
 		const finalLanding = Math.floor(Math.random() * totalItems)
 		const targetOffset =
 			spins * totalItems * TOTAL_ITEM_WIDTH +

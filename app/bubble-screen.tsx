@@ -2,17 +2,13 @@ import React from "react"
 import { View, Pressable } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from "@expo/vector-icons"
-import { useLocalSearchParams, useRouter } from "expo-router" // 1. Import these
+import { useLocalSearchParams, useRouter } from "expo-router"
 import BreathingBubble from "@/components/BreathingBubble"
 
 export default function BubbleScreen() {
-	// 2. Use the hook to get params
 	const { durations } = useLocalSearchParams<{ durations: string }>()
 	const router = useRouter()
 
-	// 3. Handle the data format
-	// Expo Router often passes params as strings or arrays of strings.
-	// We ensure it's an array of numbers for the bubble component.
 	const parsedDurations = React.useMemo(() => {
 		if (!durations) return [4, 4, 4, 4] // Default fallback
 		if (Array.isArray(durations)) return durations.map(Number)
@@ -31,7 +27,7 @@ export default function BubbleScreen() {
 			<View className="absolute top-12 left-6 z-50">
 				<Pressable
 					onPress={() => router.back()}
-					className="p-2 bg-black/10 rounded-full"
+					className="p-2 bg-black/50 rounded-full"
 				>
 					<Ionicons name="close" size={28} color="white" />
 				</Pressable>

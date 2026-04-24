@@ -50,14 +50,18 @@ export default function TodayScreen() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
 			>
-				<View className="flex-row items-center justify-between bg-mum-bg px-4 pb-3 pt-2">
-					<View className="h-10 w-10 items-center justify-center rounded-full border border-pink-200/50 bg-white">
-						<Text className="text-lg">💗</Text>
+				<View className="flex-row items-center bg-mum-bg px-4 pb-3 pt-2">
+					<View className="flex-1 items-start">
+						<View className="h-10 w-10 flex items-center justify-center rounded-full border border-pink-200/50 bg-white">
+							<Text className="text-lg">💗</Text>
+						</View>
 					</View>
-					<Text className="text-[17px] font-semibold text-mum-ink">
-						{dateLabel}
-					</Text>
-					<View className="flex-row items-center gap-1">
+					<View className="flex-1 items-center justify-center">
+						<Text className="text-[17px] font-semibold text-mum-ink">
+							{dateLabel}
+						</Text>
+					</View>
+					<View className="flex-1 flex-row justify-end gap-1">
 						<Pressable
 							accessibilityLabel="Calendar"
 							className="h-10 w-10 items-center justify-center rounded-full active:bg-white/60"
@@ -82,9 +86,10 @@ export default function TodayScreen() {
 				</View>
 
 				<LinearGradient
-					colors={["#fff5f7", "#fdf2f8", "#fce7f3"]}
+					colors={["#fff5f7", "#fdedf6", "#fad1e8"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 1 }}
+					locations={[0, 0.4, 1]}
 					style={{
 						paddingHorizontal: 24,
 						paddingTop: 28,
@@ -179,7 +184,8 @@ export default function TodayScreen() {
 										Movement exercises
 									</Text>
 									<Text className="mt-2 text-sm leading-5 text-mum-ink/65">
-										Gentle routines for strength, posture, and recovery.
+										Gentle routines for strength, posture,
+										and recovery.
 									</Text>
 								</View>
 								<View className="rounded-2xl bg-[#dbeafe] p-3">
@@ -206,7 +212,6 @@ export default function TodayScreen() {
 							</View>
 						</Pressable>
 					</Link>
-
 				</View>
 			</ScrollView>
 			<AnimatedBreathingButton />

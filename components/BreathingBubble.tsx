@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from "react"
 import { Animated, Easing, StyleSheet, Text, View } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 
+const INHALE_SIZE = 1.1
+const EXHALE_SIZE = .75
+
 interface BreathingBubbleProps {
-	/** [Inhale, Hold, Exhale, Hold] in seconds */
 	durations: number[]
 }
 
@@ -11,77 +13,54 @@ const BUBBLE_SIZE = 224
 const RADIUS = BUBBLE_SIZE / 2
 
 export default function BreathingBubble({ durations }: BreathingBubbleProps) {
-	const scale = useRef(new Animated.Value(0.92)).current
+	const scale = useRef(new Animated.Value(EXHALE_SIZE)).current
 	const [phaseText, setPhaseText] = useState("")
+	const [seconds, setSeconds] = useState(0)
 
 	useEffect(() => {
-		const [inhale, hold1, exhale, hold2] = durations.map((d) => d * 1000)
+		const msDurations = durations.map((d) => d * 1000)
 		let isCancelled = false
+		let timerId: ReturnType<typeof setInterval>
 
-		// Fix 1: Explicitly type the sequenceSteps array
-		const sequenceSteps: Animated.CompositeAnimation[] = []
+		const sequenceSteps = msDurations
+			.map((d, i) => {
+				const isHoldOrExhale = i === 2 || i === 3
+				const target = isHoldOrExhale ? EXHALE_SIZE : INHALE_SIZE
 
-		// 1. Inhale
-		if (inhale > 0) {
-			sequenceSteps.push(
-				Animated.timing(scale, {
-					toValue: 1.15,
-					duration: inhale,
+				return Animated.timing(scale, {
+					toValue: target,
+					duration: d,
 					easing: Easing.inOut(Easing.quad),
 					useNativeDriver: true,
-				}),
-			)
-		}
-
-		// 2. Hold (Full)
-		if (hold1 > 0) {
-			sequenceSteps.push(
-				Animated.timing(scale, {
-					toValue: 1.15,
-					duration: hold1,
-					useNativeDriver: true,
-				}),
-			)
-		}
-
-		// 3. Exhale
-		if (exhale > 0) {
-			sequenceSteps.push(
-				Animated.timing(scale, {
-					toValue: 0.92,
-					duration: exhale,
-					easing: Easing.inOut(Easing.quad),
-					useNativeDriver: true,
-				}),
-			)
-		}
-
-		// 4. Hold (Empty)
-		if (hold2 > 0) {
-			sequenceSteps.push(
-				Animated.timing(scale, {
-					toValue: 0.92,
-					duration: hold2,
-					useNativeDriver: true,
-				}),
-			)
-		}
+				})
+			})
+			.filter((_, i) => durations[i] > 0)
 
 		const playStep = (index: number) => {
 			if (isCancelled || sequenceSteps.length === 0) return
 
-			const phaseNames = ["Inhale", "Hold", "Exhale", "Hold"]
-			const activeSteps = [inhale, hold1, exhale, hold2]
-				.map((d, i) => (d > 0 ? phaseNames[i] : null))
-				.filter((name): name is string => name !== null)
+			setSeconds(0)
+			if (timerId) clearInterval(timerId)
 
-			const currentText = activeSteps[index % activeSteps.length]
-			setPhaseText(currentText || "")
+			const phaseNames = ["Inhale", "Hold", "Exhale", "Hold"]
+			const activePhases = durations
+				.map((d, i) =>
+					d > 0 ? { name: phaseNames[i], limit: d } : null,
+				)
+				.filter((p): p is { name: string; limit: number } => p !== null)
+
+			const currentPhase = activePhases[index % activePhases.length]
+			setPhaseText(currentPhase.name)
+
+			timerId = setInterval(() => {
+				setSeconds((prev) => {
+					if (prev < currentPhase.limit) return prev + 1
+					return prev
+				})
+			}, 1000)
 
 			const currentAnim = sequenceSteps[index % sequenceSteps.length]
-
-			// Fix 2: Type the 'finished' parameter
-			currentAnim.start(({ finished }: { finished: boolean }) => {
+			currentAnim.start(({ finished }) => {
 				if (finished && !isCancelled) {
 					playStep(index + 1)
 				}
@@ -93,6 +72,7 @@ export default function BreathingBubble({ durations }: BreathingBubbleProps) {
 		return () => {
 			isCancelled = true
 			scale.stopAnimation()
+			if (timerId) clearInterval(timerId)
 		}
 	}, [durations])
 
@@ -137,6 +117,7 @@ export default function BreathingBubble({ durations }: BreathingBubbleProps) {
 
 						<View style={styles.textContainer}>
 							<Text style={styles.statusText}>{phaseText}</Text>
+							<Text style={styles.counterText}>{seconds}</Text>
 						</View>
 					</View>
 				</View>
@@ -150,6 +131,13 @@ export default function BreathingBubble({ durations }: BreathingBubbleProps) {
 }
 
 const styles = StyleSheet.create({
+	counterText: {
+		fontSize: 32,
+		fontWeight: "300",
+		fontVariant: ["tabular-nums"],
+		color: "#2A1B3D",
+		opacity: 0.8,
+	},
 	shadowWrapper: {
 		elevation: 20,
 		shadowColor: "#6E3F9C",
@@ -197,6 +185,7 @@ const styles = StyleSheet.create({
 		...StyleSheet.absoluteFillObject,
 		alignItems: "center",
 		justifyContent: "center",
+		gap: 12,
 	},
 	statusText: {
 		fontSize: 22,
