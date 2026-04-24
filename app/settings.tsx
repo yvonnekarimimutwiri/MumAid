@@ -7,6 +7,34 @@ export const options = { title: "Settings" }
 
 export default function SettingsScreen() {
 	const [bioLock, setBioLock] = useState(false)
+	const [supportContacts, setSupportContacts] = useState([
+		{ name: "", phone: "" },
+	])
+
+	const updateSupportContact = (
+		index: number,
+		field: "name" | "phone",
+		value: string,
+	) => {
+		setSupportContacts((prev) =>
+			prev.map((contact, i) =>
+				i === index ? { ...contact, [field]: value } : contact,
+			),
+		)
+	}
+
+	const addSupportContact = () => {
+		setSupportContacts((prev) =>
+			prev.length >= 6 ? prev : [...prev, { name: "", phone: "" }],
+		)
+	}
+
+	const removeSupportContact = (index: number) => {
+		setSupportContacts((prev) => {
+			if (prev.length <= 1) return prev
+			return prev.filter((_, i) => i !== index)
+		})
+	}
 
 	return (
 		<ScrollView
@@ -40,17 +68,56 @@ export default function SettingsScreen() {
 				<Text className="text-sm font-semibold text-mum-ink">
 					Support person
 				</Text>
-				<TextInput
-					placeholder="Name"
-					placeholderTextColor="#C9A5E4"
-					className="mt-2 rounded-xl border border-mum-purple/20 bg-white/70 px-3 py-2.5 text-mum-ink"
-				/>
-				<TextInput
-					placeholder="Phone"
-					keyboardType="phone-pad"
-					placeholderTextColor="#C9A5E4"
-					className="mt-2 rounded-xl border border-mum-purple/20 bg-white/70 px-3 py-2.5 text-mum-ink"
-				/>
+				<Text className="mt-2 text-xs text-mum-ink/70">
+					You can add up to 6 support contacts (name + number).
+				</Text>
+				{supportContacts.map((contact, index) => (
+					<View
+						key={`support-contact-${index}`}
+						className="mt-3 rounded-xl border border-mum-purple/15 bg-white/70 p-3"
+					>
+						<Text className="text-xs font-semibold text-mum-ink/60">
+							Support Person {index + 1}
+						</Text>
+						<TextInput
+							value={contact.name}
+							onChangeText={(value) =>
+								updateSupportContact(index, "name", value)
+							}
+							placeholder={`Name ${index + 1}`}
+							placeholderTextColor="#C9A5E4"
+							className="mt-2 rounded-xl border border-mum-purple/20 bg-white px-3 py-2.5 text-mum-ink"
+						/>
+						<TextInput
+							value={contact.phone}
+							onChangeText={(value) =>
+								updateSupportContact(index, "phone", value)
+							}
+							placeholder={`Phone ${index + 1}`}
+							keyboardType="phone-pad"
+							placeholderTextColor="#C9A5E4"
+							className="mt-2 rounded-xl border border-mum-purple/20 bg-white px-3 py-2.5 text-mum-ink"
+						/>
+						<Pressable
+							onPress={() => removeSupportContact(index)}
+							disabled={supportContacts.length === 1}
+							className="mt-2 self-start rounded-xl border border-mum-purple/20 px-3 py-2.5 active:opacity-80 disabled:opacity-40"
+						>
+							<Text className="text-xs font-semibold text-mum-purpleDeep">
+								Remove
+							</Text>
+						</Pressable>
+					</View>
+				))}
+				<Pressable
+					onPress={addSupportContact}
+					disabled={supportContacts.length >= 6}
+					className="mt-2 self-start rounded-full border border-mum-purpleSoft/40 px-4 py-2 active:opacity-90 disabled:opacity-50"
+				>
+					<Text className="text-xs font-bold text-mum-purpleDeep">
+						+ Add Support Person ({supportContacts.length}/6)
+					</Text>
+				</Pressable>
 			</View>
 
 			<Link href="/theme-customizer" asChild>
