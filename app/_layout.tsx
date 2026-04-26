@@ -12,7 +12,6 @@ SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
 	const [isReady, setIsReady] = useState(false)
-	const [hasToken, setHasToken] = useState(false)
 
 	const segments = useSegments()
 	const router = useRouter()
@@ -21,9 +20,8 @@ export default function RootLayout() {
 		const checkAuth = async () => {
 			try {
 				const token = await tokenStorage.getAccessToken()
-				setHasToken(!!token)
 			} catch (e) {
-				setHasToken(false)
+				// Ignore and continue to app routing; token will be treated as missing.
 			} finally {
 				setIsReady(true)
 			}
@@ -35,8 +33,15 @@ export default function RootLayout() {
 		if (!isReady) return
 
 		const inAuthGroup = segments[0] === "(auth)"
+		const timeout = setTimeout(async () => {
+			let hasToken = false
+			try {
+				const token = await tokenStorage.getAccessToken()
+				hasToken = !!token
+			} catch (e) {
+				hasToken = false
+			}
 
-		const timeout = setTimeout(() => {
 			if (!hasToken && !inAuthGroup) {
 				router.replace("/(auth)/login")
 			} else if (hasToken && inAuthGroup) {
@@ -47,7 +52,7 @@ export default function RootLayout() {
 		}, 1)
 
 		return () => clearTimeout(timeout)
-	}, [hasToken, isReady, segments])
+	}, [isReady, segments])
 
 	if (!isReady) return null
 

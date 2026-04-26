@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons"
-import { Pressable, Text, View } from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 
 export default function RoleCard({
 	title,
@@ -15,28 +15,20 @@ export default function RoleCard({
 	return (
 		<Pressable
 			onPress={onPress}
-			className={`flex-1 items-center justify-center p-6 rounded-3xl border-2 transition-all ${
-				selected
-					? "bg-fuchsia-50 border-fuchsia-500 shadow-sm"
-					: "bg-zinc-50 border-zinc-100"
-			}`}
+			style={[styles.card, selected ? styles.cardSelected : styles.cardDefault]}
 		>
-			<View
-				className={`p-3 rounded-full mb-2 ${selected ? "bg-fuchsia-100" : "bg-zinc-100"}`}
-			>
+			<View style={[styles.iconWrap, selected ? styles.iconSelected : styles.iconDefault]}>
 				<Ionicons
 					name={icon}
 					size={28}
 					color={selected ? "#d946ef" : "#71717a"}
 				/>
 			</View>
-			<Text
-				className={`font-bold ${selected ? "text-fuchsia-700" : "text-zinc-500"}`}
-			>
+			<Text style={[styles.title, selected ? styles.titleSelected : styles.titleDefault]}>
 				{title}
 			</Text>
 			{selected && (
-				<View className="absolute top-2 right-2">
+				<View style={styles.checkmark}>
 					<Ionicons
 						name="checkmark-circle"
 						size={20}
@@ -47,3 +39,48 @@ export default function RoleCard({
 		</Pressable>
 	)
 }
+
+const styles = StyleSheet.create({
+	card: {
+		flex: 1,
+		alignItems: "center",
+		justifyContent: "center",
+		padding: 24,
+		borderRadius: 24,
+		borderWidth: 2,
+		position: "relative",
+	},
+	cardSelected: {
+		backgroundColor: "#fdf2f8",
+		borderColor: "#d946ef",
+	},
+	cardDefault: {
+		backgroundColor: "#fafafa",
+		borderColor: "#f4f4f5",
+	},
+	iconWrap: {
+		padding: 12,
+		borderRadius: 999,
+		marginBottom: 8,
+	},
+	iconSelected: {
+		backgroundColor: "#fae8ff",
+	},
+	iconDefault: {
+		backgroundColor: "#f4f4f5",
+	},
+	title: {
+		fontWeight: "700",
+	},
+	titleSelected: {
+		color: "#a21caf",
+	},
+	titleDefault: {
+		color: "#71717a",
+	},
+	checkmark: {
+		position: "absolute",
+		top: 8,
+		right: 8,
+	},
+})

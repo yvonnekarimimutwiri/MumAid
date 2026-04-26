@@ -1,9 +1,12 @@
 import { Ionicons } from "@expo/vector-icons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Image } from "expo-image"
+import { useRouter } from "expo-router"
 import * as ImagePicker from "expo-image-picker"
 import { Link } from "expo-router"
-import { useEffect, useState } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { useCallback, useState } from "react"
+import { tokenStorage } from "@/utils/storage"
 import {
 	Alert,
 	Pressable,
@@ -20,18 +23,42 @@ const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
 export default function SettingsScreen() {
 	const [bioLock, setBioLock] = useState(false)
 	const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null)
+	const [accountEmail, setAccountEmail] = useState<string | null>(null)
+	const [storedAccounts, setStoredAccounts] = useState<string[]>([])
 	const [supportContacts, setSupportContacts] = useState([
 		{ name: "", phone: "" },
 	])
+	const router = useRouter()
 
-	useEffect(() => {
-		const loadProfilePhoto = async () => {
-			const savedUri = await AsyncStorage.getItem(PROFILE_PHOTO_KEY)
-			if (savedUri) setProfilePhotoUri(savedUri)
-		}
-
-		void loadProfilePhoto()
+	const loadProfileData = useCallback(async () => {
+		const savedUri = await AsyncStorage.getItem(PROFILE_PHOTO_KEY)
+		if (savedUri) setProfilePhotoUri(savedUri)
+		const activeEmail = await tokenStorage.getActiveAccountEmail()
+		setAccountEmail(activeEmail)
+		const accounts = await tokenStorage.listAccounts()
+		setStoredAccounts(accounts.map((account) => account.email))
 	}, [])
+
+	useFocusEffect(
+		useCallback(() => {
+			void loadProfileData()
+		}, [loadProfileData]),
+	)
+
+	const handleLogout = async () => {
+		await tokenStorage.clearTokens()
+		router.replace("/(auth)/login")
+	}
+
+	const handleSwitchAccount = async (email: string) => {
+		const switched = await tokenStorage.switchAccount(email)
+		if (!switched) {
+			Alert.alert("Switch failed", "Could not switch to this account.")
+			return
+		}
+		setAccountEmail(email)
+		router.replace("/(tabs)")
+	}
 
 	const saveProfilePhoto = async (uri: string) => {
 		setProfilePhotoUri(uri)
@@ -303,6 +330,52 @@ export default function SettingsScreen() {
 				<Pressable className="mt-3 self-start rounded-full bg-mum-purpleDeep px-4 py-2 active:opacity-90">
 					<Text className="font-semibold text-white">
 						Set up partner
+					</Text>
+				</Pressable>
+			</View>
+
+			<View className="mt-4 rounded-2xl border border-fuchsia-200 bg-white p-4">
+				<Text className="text-xs text-mum-ink/70">Account email</Text>
+				<Text className="mt-1 text-sm text-mum-purpleDeep">
+					{accountEmail || "Unknown account"}
+				</Text>
+				<View className="mt-4">
+					<Text className="text-xs text-mum-ink/70">Switch account</Text>
+					{storedAccounts.filter((email) => email !== accountEmail).length >
+					0 ? (
+						storedAccounts
+							.filter((email) => email !== accountEmail)
+							.map((email) => (
+								<Pressable
+									key={email}
+									onPress={() => handleSwitchAccount(email)}
+									className="mt-2 self-start rounded-full border border-mum-purpleSoft/40 px-4 py-2 active:opacity-90"
+								>
+									<Text className="text-xs font-semibold text-mum-purpleDeep">
+										Use {email}
+									</Text>
+								</Pressable>
+							))
+					) : (
+						<Text className="mt-2 text-xs text-mum-ink/70">
+							No other saved accounts yet.
+						</Text>
+					)}
+					<Pressable
+						onPress={() => router.push("/(auth)/login")}
+						className="mt-3 self-start rounded-full bg-mum-purpleDeep px-4 py-2 active:opacity-90"
+					>
+						<Text className="text-xs font-semibold text-white">
+							Add account
+						</Text>
+					</Pressable>
+				</View>
+				<Pressable
+					onPress={handleLogout}
+					className="mt-4 self-start rounded-full border border-rose-300 px-4 py-2 active:opacity-90"
+				>
+					<Text className="text-xs font-semibold text-rose-600">
+						Logout
 					</Text>
 				</Pressable>
 			</View>

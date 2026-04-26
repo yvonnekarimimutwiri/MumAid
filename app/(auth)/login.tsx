@@ -32,7 +32,22 @@ export default function LoginScreen() {
 			const data = await res.json()
 
 			if (res.ok) {
-				await tokenStorage.saveTokens(data.access, data.refresh)
+				const roleFromResponse =
+					data?.role ??
+					data?.user?.role ??
+					data?.user_type ??
+					data?.account_type ??
+					null
+				const emailFromResponse = data?.email ?? data?.user?.email ?? email
+				await tokenStorage.saveTokens(
+					data.access,
+					data.refresh,
+					String(emailFromResponse),
+				)
+				await tokenStorage.saveUserProfile({
+					email: String(emailFromResponse),
+					role: roleFromResponse ? String(roleFromResponse) : null,
+				})
 				router.replace("/(tabs)")
 			} else {
 				Alert.alert(

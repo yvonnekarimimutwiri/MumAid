@@ -144,7 +144,7 @@ export default function RomanceHubScreen() {
 			>
 				<View className="mx-6 mb-8 mt-6">
 					<Text className="text-xs font-bold uppercase tracking-[2px] text-mum-purpleDeep/40">
-						Today's Ritual
+						Today's activity
 					</Text>
 					<Text className="mt-2 text-lg font-medium italic text-mum-ink/80">
 						"{dailyRitual}"
