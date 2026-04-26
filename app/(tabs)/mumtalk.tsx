@@ -1,4 +1,5 @@
-import { VIDEOS } from "@/data/mockdata"
+import { CommentType, VIDEOS } from "@/data/mockdata"
+import { getTotalCommentsCount } from "@/utils/functions"
 import { Ionicons } from "@expo/vector-icons"
 import { useFocusEffect, useIsFocused } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
@@ -6,11 +7,13 @@ import { LinearGradient } from "expo-linear-gradient"
 import { useNavigation } from "expo-router"
 import { setStatusBarStyle } from "expo-status-bar"
 import { useVideoPlayer, VideoView } from "expo-video"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
 	ActivityIndicator,
 	Dimensions,
 	Image,
+	Keyboard,
+	KeyboardAvoidingView,
 	LayoutChangeEvent,
 	NativeScrollEvent,
 	NativeSyntheticEvent,
@@ -19,6 +22,7 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
+	TextInput,
 	View,
 } from "react-native"
 
@@ -153,6 +157,25 @@ function VideoItem({
 }) {
 	const [status, setStatus] = useState<string>("loading")
 	const [isUserPaused, setIsUserPaused] = useState(false)
+	const [showComments, setShowComments] = useState(false)
+	const [commentText, setCommentText] = useState("")
+	const [replyTarget, setReplyTarget] = useState<string | null>(null)
+	const inputRef = useRef<TextInput>(null)
+
+	const handleReplyRequest = (user: string) => {
+		setReplyTarget(user)
+		setCommentText(`@${user} `) // Pre-fill the mention
+		inputRef.current?.focus()
+	}
+
+	const submitComment = () => {
+		if (!commentText.trim()) return
+		console.log(`Submitting to ${replyTarget || "Video"}: ${commentText}`)
+		// Reset after submit
+		setCommentText("")
+		setReplyTarget(null)
+		Keyboard.dismiss()
+	}
 
 	const player = useVideoPlayer(shouldLoad ? video.source : null, (p) => {
 		p.loop = true
@@ -315,8 +338,179 @@ function VideoItem({
 									Share
 								</Text>
 							</Pressable>
+							<Pressable
+								onPress={() => setShowComments(true)}
+								className="flex-row items-center gap-2"
+							>
+								<Ionicons
+									name="chatbubble"
+									size={20}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									{getTotalCommentsCount(video.comments)}
+								</Text>
+							</Pressable>
 						</View>
 					</View>
+				</View>
+			)}
+
+			{showComments && (
+				<View className="absolute inset-0 z-[60] bg-black/60">
+					<KeyboardAvoidingView
+						behavior={Platform.OS === "ios" ? "padding" : "height"}
+						className="flex-1"
+					>
+						<Pressable
+							className="flex-1"
+							onPress={() => setShowComments(false)}
+						/>
+
+						<View className="h-[70%] bg-zinc-950 rounded-t-[32px] border-t border-white/10 shadow-2xl">
+							{/* Header */}
+							<View className="flex-row items-center justify-between p-6 border-b border-white/5">
+								<Text className="text-white font-bold text-lg">
+									{video.comments.length} Comments
+								</Text>
+								<Pressable
+									onPress={() => setShowComments(false)}
+								>
+									<Ionicons
+										name="close"
+										size={24}
+										color="white"
+									/>
+								</Pressable>
+							</View>
+
+							{/* List */}
+							<ScrollView
+								className="flex-1 p-6"
+								showsVerticalScrollIndicator={false}
+							>
+								{video.comments.map(
+									(comment: CommentType, index: number) => (
+										<CommentItem
+											key={index}
+											comment={comment}
+											onReply={handleReplyRequest}
+										/>
+									),
+								)}
+							</ScrollView>
+
+							{/* Input Area */}
+							<View className="p-4 bg-zinc-950 border-t border-white/10">
+								{replyTarget && (
+									<View className="flex-row justify-between items-center mb-2 px-2">
+										<Text className="text-zinc-500 text-xs">
+											Replying to @{replyTarget}
+										</Text>
+										<Pressable
+											onPress={() => setReplyTarget(null)}
+										>
+											<Text className="text-fuchsia-500 text-xs">
+												Cancel
+											</Text>
+										</Pressable>
+									</View>
+								)}
+								<View className="flex-row items-center gap-3 bg-zinc-900 rounded-2xl px-4 py-2">
+									<TextInput
+										ref={inputRef}
+										className="flex-1 text-white py-2"
+										placeholder="Add a comment..."
+										placeholderTextColor="#71717a"
+										value={commentText}
+										onChangeText={setCommentText}
+										multiline
+									/>
+									<Pressable
+										onPress={submitComment}
+										disabled={!commentText.trim()}
+										className={
+											commentText.trim()
+												? "opacity-100"
+												: "opacity-30"
+										}
+									>
+										<Ionicons
+											name="arrow-up-circle"
+											size={32}
+											color="#d946ef"
+										/>
+									</Pressable>
+								</View>
+							</View>
+						</View>
+					</KeyboardAvoidingView>
+				</View>
+			)}
+		</View>
+	)
+}
+
+function CommentItem({
+	comment,
+	depth = 0,
+	onReply,
+}: {
+	comment: CommentType
+	depth?: number
+	onReply: (user: string) => void
+}) {
+	const [showReplies, setShowReplies] = useState(false)
+	const hasReplies = comment.replies && comment.replies.length > 0
+
+	return (
+		<View style={{ marginLeft: depth > 0 ? 12 : 0 }} className="mb-4">
+			<View className="flex-row gap-3">
+				<View className="h-8 w-8 rounded-full bg-zinc-800 items-center justify-center border border-white/10">
+					<Text className="text-white text-xs font-bold">
+						{comment.user[0].toUpperCase()}
+					</Text>
+				</View>
+				<View className="flex-1">
+					<Text className="text-zinc-400 text-xs font-bold">
+						@{comment.user}
+					</Text>
+					<Text className="text-white text-sm mt-0.5">
+						{comment.text}
+					</Text>
+
+					<View className="flex-row items-center gap-4 mt-2">
+						<Pressable onPress={() => onReply(comment.user)}>
+							<Text className="text-zinc-500 text-xs font-bold">
+								Reply
+							</Text>
+						</Pressable>
+
+						{hasReplies && (
+							<Pressable
+								onPress={() => setShowReplies(!showReplies)}
+							>
+								<Text className="text-fuchsia-400 text-xs font-bold">
+									{showReplies
+										? "Hide"
+										: `View ${comment.replies ? getTotalCommentsCount(comment.replies) : 0} replies`}
+								</Text>
+							</Pressable>
+						)}
+					</View>
+				</View>
+			</View>
+
+			{showReplies && hasReplies && (
+				<View className="mt-3 border-l-2 border-zinc-900 ml-4">
+					{comment.replies!.map((reply, index) => (
+						<CommentItem
+							key={index}
+							comment={reply}
+							depth={depth + 1}
+							onReply={onReply}
+						/>
+					))}
 				</View>
 			)}
 		</View>

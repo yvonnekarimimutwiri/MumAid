@@ -80,13 +80,36 @@ export const MILK_LOCATIONS: MilkLoc[] = [
 	},
 ]
 
-export const VIDEOS = [
+export type CommentType = {
+	text: string
+	user: string
+	replies?: CommentType[]
+}
+
+interface VideoType {
+	id: string
+	source: string
+	topic: string
+	caption: string
+	comments: CommentType[]
+}
+
+export const VIDEOS: VideoType[] = [
 	{
 		id: "1",
 		// source: require("@/assets/uploads/first_time_mom_5_hacks.mp4"),
 		source: "",
 		topic: "LIFESTYLE",
 		caption: "5 hacks for first-time mums.",
+		comments: [
+			{ text: "Cool", user: "John Doe" },
+			{ text: "Beautiful", user: "Daryl" },
+			{
+				text: "Very helpful",
+				user: "Earl Davis",
+				replies: [{ text: "Yes, learnt a lot", user: "Mr. Andrews" }],
+			},
+		],
 	},
 	{
 		id: "2",
@@ -94,6 +117,7 @@ export const VIDEOS = [
 		source: "",
 		topic: "FEEDING",
 		caption: "Newborn nany tips",
+		comments: [{ text: "Very insightful", user: "Robert Davids" }],
 	},
 	{
 		id: "3",
@@ -101,5 +125,24 @@ export const VIDEOS = [
 		source: "",
 		topic: "TIPS",
 		caption: "Tips for expecting mums.",
+		comments: [
+			{
+				text: "I like the first tip",
+				user: "Davidson Roberts",
+				replies: [
+					{
+						text: "Children are fragile, picking them up should be treated with importance",
+						user: "Sharon Matthews",
+						replies: [
+							{
+								text: "So many people just picking up kids however they want",
+								user: "Angela Davies",
+							},
+						],
+					},
+					{ text: "Facts", user: "Monicah Falange" },
+				],
+			},
+		],
 	},
 ]
