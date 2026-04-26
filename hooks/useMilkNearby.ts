@@ -3,8 +3,9 @@ import { Location as MilkLoc } from "@/utils/geo"
 import * as LocationGeos from "expo-location"
 import { useCallback, useEffect, useState } from "react"
 
-const INITIAL_GRID_STEP = 0.1
-const MAX_GRID_STEP = 1
+const INITIAL_GRID_STEP = 1
+const MAX_GRID_STEP = 5
+const STEP_UP_BY = 2
 
 export function useMilkNearby(mode: "DONATE" | "BUY" | undefined) {
 	const [userLoc, setUserLoc] = useState<{
@@ -29,7 +30,7 @@ export function useMilkNearby(mode: "DONATE" | "BUY" | undefined) {
 					const inLngRange = Math.abs(loc.lng - lng) <= currentStep
 					return matchesType && inLatRange && inLngRange
 				})
-				currentStep += 0.2
+				currentStep += STEP_UP_BY
 			}
 			setFilteredLocations(found)
 		},
