@@ -9,7 +9,7 @@ import {
 	Text,
 	View,
 } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 const { width } = Dimensions.get("window")
 const ITEM_WIDTH = 220
@@ -137,7 +137,7 @@ export default function RomanceHubScreen() {
 	}
 
 	return (
-		<View className="flex-1 bg-mum-bg">
+		<SafeAreaView className="flex-1 bg-mum-bg">
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
@@ -310,6 +310,6 @@ export default function RomanceHubScreen() {
 					))}
 				</View>
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	)
 }

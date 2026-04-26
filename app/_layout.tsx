@@ -7,52 +7,67 @@ import { useEffect, useState } from "react"
 import "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import "./global.css"
+import { authApi } from "@/utils/auth"
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
 	const [isReady, setIsReady] = useState(false)
+	const [hasToken, setHasToken] = useState(false)
+	const [userRole, setUserRole] = useState<string | null>(null)
 
 	const segments = useSegments()
 	const router = useRouter()
 
 	useEffect(() => {
-		const checkAuth = async () => {
+		const initializeAuth = async () => {
 			try {
 				const token = await tokenStorage.getAccessToken()
+				if (token) {
+					setHasToken(true)
+					const res = await authApi.whoami(token)
+					if (res.ok) {
+						const data = await res.json()
+						setUserRole(data.role)
+					}
+				}
 			} catch (e) {
-				// Ignore and continue to app routing; token will be treated as missing.
+				setHasToken(false)
 			} finally {
 				setIsReady(true)
 			}
 		}
-		checkAuth()
+		initializeAuth()
 	}, [])
 
 	useEffect(() => {
 		if (!isReady) return
 
 		const inAuthGroup = segments[0] === "(auth)"
-		const timeout = setTimeout(async () => {
-			let hasToken = false
-			try {
-				const token = await tokenStorage.getAccessToken()
-				hasToken = !!token
-			} catch (e) {
-				hasToken = false
-			}
+		const inPartnerGroup = segments[0] === "(partner)"
+		const inTabsGroup = segments[0] === "(tabs)"
 
+
+		const timeout = setTimeout(() => {
 			if (!hasToken && !inAuthGroup) {
 				router.replace("/(auth)/login")
-			} else if (hasToken && inAuthGroup) {
-				router.replace("/(tabs)")
-			} else {
-				SplashScreen.hideAsync()
+			} else if (hasToken) {
+				if (userRole === "partner") {
+					if (inAuthGroup || inTabsGroup) {
+						router.replace("/(partner)")
+					}
+				} else {
+					if (inPartnerGroup || inAuthGroup) {
+						router.replace("/(tabs)")
+					}
+				}
 			}
+
+			SplashScreen.hideAsync()
 		}, 1)
 
 		return () => clearTimeout(timeout)
-	}, [isReady, segments])
+	}, [isReady, segments, hasToken, userRole])
 
 	if (!isReady) return null
 
@@ -82,11 +97,8 @@ export default function RootLayout() {
 						options={{ headerShown: false }}
 					/>
 					<Stack.Screen
-						name="romance-hub"
-						options={{
-							headerTitle: "Romance",
-							presentation: "card",
-						}}
+						name="(partner)"
+						options={{ headerShown: false }}
 					/>
 					<Stack.Screen
 						name="bubble-screen"

@@ -11,12 +11,21 @@ import {
 	Image,
 	ActivityIndicator,
 } from "react-native"
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from "expo-linking"
+import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { BASE_URL } from "@/constants/Config"
+
 const GoogleLogo = require("@/assets/icons/googleg_standard_color_128dp.png")
+
+WebBrowser.maybeCompleteAuthSession()
 
 export default function LoginScreen() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
+	const [googleLoading, setGoogleLoading] = useState(false)
+
 	const router = useRouter()
 
 	const handleLogin = async () => {
@@ -57,6 +66,39 @@ export default function LoginScreen() {
 			}
 		} catch (err) {
 			Alert.alert("Error", "Check your internet connection")
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const handleGoogleLogin = async () => {
+		setLoading(true)
+		try {
+			const redirectUrl = Linking.createURL("/(auth)/login")
+
+			const authUrl = `${BASE_URL}/auth/v1/google/login/?redirect_uri=${encodeURIComponent(redirectUrl)}`
+
+			const result = await WebBrowser.openAuthSessionAsync(
+				authUrl,
+				redirectUrl,
+			)
+
+			if (result.type === "success") {
+				const { queryParams } = Linking.parse(result.url)
+
+				if (queryParams?.access && queryParams?.refresh) {
+					await tokenStorage.saveTokens(
+						String(queryParams.access),
+						String(queryParams.refresh),
+						String(queryParams.email || ""),
+					)
+					router.replace("/(tabs)")
+				}
+			} else {
+				Alert.alert("Cancelled", "Google login was closed.")
+			}
+		} catch (err) {
+			Alert.alert("Error", "Could not open Google Login.")
 		} finally {
 			setLoading(false)
 		}
@@ -108,17 +150,24 @@ export default function LoginScreen() {
 			</View>
 
 			<Pressable
-				onPress={() => {}}
+				onPress={handleGoogleLogin}
+				disabled={googleLoading || loading}
 				className="border border-zinc-200 p-4 rounded-full flex-row justify-center items-center gap-3 active:bg-zinc-50"
 			>
-				<Image
-					source={GoogleLogo}
-					style={{ width: 22, height: 22 }}
-					resizeMode="contain"
-				/>
-				<Text className="font-semibold text-zinc-800">
-					Continue with Google
-				</Text>
+				{googleLoading ? (
+					<ActivityIndicator color="#71717a" />
+				) : (
+					<>
+						<Image
+							source={GoogleLogo}
+							style={{ width: 22, height: 22 }}
+							resizeMode="contain"
+						/>
+						<Text className="font-semibold text-zinc-800">
+							Continue with Google
+						</Text>
+					</>
+				)}
 			</Pressable>
 
 			<View className="flex-row justify-center mt-10">
