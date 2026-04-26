@@ -1,11 +1,56 @@
-import "react-native-gesture-handler"
-import { Stack } from "expo-router"
+import { ThemeProvider } from "@/context/ThemeContext"
+import { tokenStorage } from "@/utils/storage"
+import { Stack, useRouter, useSegments } from "expo-router"
+import * as SplashScreen from "expo-splash-screen"
 import { StatusBar } from "expo-status-bar"
+import { useEffect, useState } from "react"
+import "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import "./global.css"
-import { ThemeProvider } from "@/context/ThemeContext"
+
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+	const [isReady, setIsReady] = useState(false)
+	const [hasToken, setHasToken] = useState(false)
+
+	const segments = useSegments()
+	const router = useRouter()
+
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				const token = await tokenStorage.getAccessToken()
+				setHasToken(!!token)
+			} catch (e) {
+				setHasToken(false)
+			} finally {
+				setIsReady(true)
+			}
+		}
+		checkAuth()
+	}, [])
+
+	useEffect(() => {
+		if (!isReady) return
+
+		const inAuthGroup = segments[0] === "(auth)"
+
+		const timeout = setTimeout(() => {
+			if (!hasToken && !inAuthGroup) {
+				router.replace("/(auth)/login")
+			} else if (hasToken && inAuthGroup) {
+				router.replace("/(tabs)")
+			} else {
+				SplashScreen.hideAsync()
+			}
+		}, 1)
+
+		return () => clearTimeout(timeout)
+	}, [hasToken, isReady, segments])
+
+	if (!isReady) return null
+
 	return (
 		<ThemeProvider>
 			<SafeAreaProvider>
@@ -27,7 +72,10 @@ export default function RootLayout() {
 						name="(tabs)"
 						options={{ headerShown: false }}
 					/>
-					{/* Explicitly defining the hub here fixes the context error */}
+					<Stack.Screen
+						name="(auth)"
+						options={{ headerShown: false }}
+					/>
 					<Stack.Screen
 						name="romance-hub"
 						options={{
@@ -67,10 +115,7 @@ export default function RootLayout() {
 						name="exercises"
 						options={{ title: "Exercises" }}
 					/>
-					<Stack.Screen
-						name="milk"
-						options={{ title: "Milk" }}
-					/>
+					<Stack.Screen name="milk" options={{ title: "Milk" }} />
 					<Stack.Screen
 						name="healthcare"
 						options={{ title: "Healthcare" }}
