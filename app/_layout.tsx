@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/context/ThemeContext"
 import { tokenStorage } from "@/utils/storage"
-import { Stack, usePathname, useRouter } from "expo-router"
+import { Stack, usePathname, useRouter, useSegments } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { StatusBar } from "expo-status-bar"
 import { useEffect, useState } from "react"
@@ -22,28 +22,28 @@ export default function RootLayout() {
 
 function MainLayout() {
 	const { hasToken, userRole, isLoading } = useAuth()
-	const pathname = usePathname()
+	const segments = useSegments()
 	const router = useRouter()
 
 	useEffect(() => {
 		if (isLoading) return
 
-		const inAuthGroup = pathname.startsWith("/(auth)")
-		const inPartnerGroup = pathname.startsWith("/(partner)")
-		const inTabsGroup = pathname.startsWith("/(tabs)")
+		const inAuthGroup = segments[0] === "(auth)"
+		const inPartnerGroup = segments[0] === "(partner)"
+		const inTabsGroup = segments[0] === "(tabs)"
 
 		if (!hasToken && !inAuthGroup) {
 			router.replace("/(auth)/login")
 		} else if (hasToken && userRole) {
 			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
-				router.replace("/(partner)" as never)
+				router.replace("/(partner)")
 			} else if (userRole !== "partner" && (inPartnerGroup || inAuthGroup)) {
 				router.replace("/(tabs)")
 			}
 		}
 
 		if (!isLoading) SplashScreen.hideAsync()
-	}, [hasToken, userRole, isLoading, pathname, router])
+	}, [hasToken, userRole, isLoading, segments, router])
 
 	if (isLoading) return null
 
