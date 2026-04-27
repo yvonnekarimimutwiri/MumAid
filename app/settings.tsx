@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Image } from "expo-image"
 import { useRouter } from "expo-router"
 import * as ImagePicker from "expo-image-picker"
+import * as FileSystem from "expo-file-system"
 import { Link } from "expo-router"
 import { useFocusEffect } from "@react-navigation/native"
 import { useCallback, useState } from "react"
@@ -17,6 +18,8 @@ import {
 	View,
 } from "react-native"
 import { useAuth } from "@/context/AuthContext"
+import { Platform } from "react-native"
+import { BASE_URL } from "@/constants/Config"
 
 export const options = { title: "Settings" }
 const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
@@ -29,8 +32,9 @@ export default function SettingsScreen() {
 	const [supportContacts, setSupportContacts] = useState([
 		{ name: "", phone: "" },
 	])
+	const [isUploading, setIsUploading] = useState(false)
 
-	const { logout } = useAuth()
+	const { token, logout } = useAuth()
 	const router = useRouter()
 
 	const loadProfileData = useCallback(async () => {
@@ -72,8 +76,48 @@ export default function SettingsScreen() {
 	}
 
 	const saveProfilePhoto = async (uri: string) => {
-		setProfilePhotoUri(uri)
-		await AsyncStorage.setItem(PROFILE_PHOTO_KEY, uri)
+		setIsUploading(true)
+		try {
+			// 1. Update local state and storage for immediate UI feedback
+			setProfilePhotoUri(uri)
+			await AsyncStorage.setItem(PROFILE_PHOTO_KEY, uri)
+
+			// 2. Prepare FormData
+			const formData = new FormData()
+			// @ts-ignore
+			formData.append("image", {
+				uri: Platform.OS === "ios" ? uri.replace("file://", "") : uri,
+				type: "image/jpeg",
+				name: "profile_photo.jpg",
+			})
+
+			// 3. Perform the PUT request
+			const response = await fetch(
+				`${BASE_URL}/api/auth/v1/profile/image/`,
+				{
+					method: "PUT",
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "multipart/form-data",
+					},
+					body: formData,
+				},
+			)
+
+			if (!response.ok) {
+				throw new Error("Failed to upload image to server")
+			}
+
+			Alert.alert("Success", "Profile photo updated successfully!")
+		} catch (error) {
+			console.error("Upload error:", error)
+			Alert.alert(
+				"Upload Failed",
+				"Your photo was saved locally but couldn't be synced to the server.",
+			)
+		} finally {
+			setIsUploading(false)
+		}
 	}
 
 	const handleUploadPhoto = async () => {
@@ -178,7 +222,11 @@ export default function SettingsScreen() {
 							/>
 						) : (
 							<View className="h-full w-full items-center justify-center">
-								<Ionicons name="person" size={32} color="#B57EDC" />
+								<Ionicons
+									name="person"
+									size={32}
+									color="#B57EDC"
+								/>
 							</View>
 						)}
 					</View>
@@ -186,7 +234,8 @@ export default function SettingsScreen() {
 				<View className="mt-3 flex-row flex-wrap gap-2">
 					<Pressable
 						onPress={handleTakePhoto}
-						className="rounded-full bg-mum-purpleDeep px-4 py-2 active:opacity-90"
+						disabled={isUploading}
+						className={`rounded-full ${isUploading ? "bg-zinc-400" : "bg-mum-purpleDeep"} px-4 py-2 active:opacity-90`}
 					>
 						<Text className="text-xs font-semibold text-white">
 							Take Photo
@@ -194,6 +243,7 @@ export default function SettingsScreen() {
 					</Pressable>
 					<Pressable
 						onPress={handleUploadPhoto}
+						disabled={isUploading}
 						className="rounded-full border border-mum-purpleSoft/40 px-4 py-2 active:opacity-90"
 					>
 						<Text className="text-xs font-semibold text-mum-purpleDeep">
@@ -351,9 +401,11 @@ export default function SettingsScreen() {
 					{accountEmail || "Unknown account"}
 				</Text>
 				<View className="mt-4">
-					<Text className="text-xs text-mum-ink/70">Switch account</Text>
-					{storedAccounts.filter((email) => email !== accountEmail).length >
-					0 ? (
+					<Text className="text-xs text-mum-ink/70">
+						Switch account
+					</Text>
+					{storedAccounts.filter((email) => email !== accountEmail)
+						.length > 0 ? (
 						storedAccounts
 							.filter((email) => email !== accountEmail)
 							.map((email) => (

@@ -77,7 +77,7 @@ export default function TodayScreen() {
 			>
 				<View className="flex-row items-center bg-mum-bg px-4 pb-3 pt-2">
 					<View className="flex-1 items-start">
-						<View className="h-10 w-10 flex items-center justify-center rounded-full border border-pink-200/50 bg-white">
+						<View className="h-10 w-10 flex items-center justify-center rounded-full overflow-hidden border border-pink-200/50 bg-white">
 							{profilePhotoUri ? (
 								<Image
 									source={{ uri: profilePhotoUri }}

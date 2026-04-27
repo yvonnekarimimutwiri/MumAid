@@ -4,18 +4,20 @@
     "slug": "MumAid",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icons/mumaid-icon-1024.png",
     "scheme": "mumaid",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "icon": "./assets/icons/mumaid-icon-1024.png",
+      "supportsTablet": true,
+      "userInterfaceStyle": "light"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/icons/mumaid-icon-no-bg-1024.png",
-        "monochromeImage": "./assets/icons/mumaid-icon-no-bg-1024.png"
+        "monochromeImage": "./assets/icons/mumaid-icon-monochrome-1024.png"
       },
       "config": {
         "googleMaps": {

@@ -104,7 +104,8 @@ export default function CareHubScreen() {
 						Baby Growth Input
 					</Text>
 					<Text className="mt-2 text-sm text-mum-ink/60">
-						Age auto-calculates from registration date. You can also enter age in months or years.
+						Age auto-calculates from registration date. You can also
+						enter age in months or years.
 					</Text>
 					<Text className="mt-4 text-xs font-bold uppercase tracking-widest text-mum-ink/40">
 						Registration Date (YYYY-MM-DD)
@@ -125,7 +126,8 @@ export default function CareHubScreen() {
 						className="mt-2 rounded-2xl border border-mum-purpleSoft/30 px-4 py-3 text-mum-ink"
 					/>
 					<Text className="mt-2 text-xs text-mum-ink/50">
-						Clear manual age to use registration-date calculation again.
+						Clear manual age to use registration-date calculation
+						again.
 					</Text>
 					<Text className="mt-4 text-xs font-bold uppercase tracking-widest text-mum-ink/40">
 						Child Gender
@@ -158,16 +160,15 @@ export default function CareHubScreen() {
 					Baby Essentials
 				</Text>
 				<Text className="mb-4 px-1 text-sm text-[#2D1643]/60">
-					All your baby support in one place: remedies and feeding support.
+					All your baby support in one place: remedies and feeding
+					support.
 				</Text>
-				<View className="flex-row flex-wrap justify-center gap-4">
-					<GridCard
+				<View className="flex-col flex-wrap justify-center gap-4">
+					<HubLinkRow
 						href="/remedies"
 						title="Remedies"
 						icon="medkit"
-						color="#FEE2E2"
-						iconColor="#EF4444"
-						width={(width - 52) / 2}
+						variant="remedies"
 					/>
 				</View>
 

@@ -9,7 +9,7 @@ type Props = {
 	title: string
 	subtitle?: string
 	icon: keyof typeof Ionicons.glyphMap
-	variant?: "default" | "danger"
+	variant?: "default" | "danger" | "remedies"
 }
 
 export function HubLinkRow({
@@ -22,9 +22,16 @@ export function HubLinkRow({
 	const border =
 		variant === "danger"
 			? "border-rose-100 bg-rose-50/50"
-			: "border-slate-100 bg-white"
+			: variant === "remedies"
+				? "border-[#FEE2E2] bg-[#FEE2E2]"
+				: "border-slate-100 bg-white"
 	const iconBg = variant === "danger" ? "bg-rose-100" : "bg-fuchsia-50"
-	const iconColor = variant === "danger" ? "#E11D48" : "#6E3F9C"
+	const iconColor =
+		variant === "danger"
+			? "#E11D48"
+			: variant === "remedies"
+				? "#EF4444"
+				: "#6E3F9C"
 
 	return (
 		<Link href={href} asChild>

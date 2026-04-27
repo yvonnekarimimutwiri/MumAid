@@ -1,14 +1,12 @@
+import { AuthProvider, useAuth } from "@/context/AuthContext"
 import { ThemeProvider } from "@/context/ThemeContext"
-import { tokenStorage } from "@/utils/storage"
-import { Stack, usePathname, useRouter, useSegments } from "expo-router"
+import { Stack, useRouter, useSegments } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { StatusBar } from "expo-status-bar"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import "./global.css"
-import { authApi } from "@/utils/auth"
-import { AuthProvider, useAuth } from "@/context/AuthContext"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -37,7 +35,10 @@ function MainLayout() {
 		} else if (hasToken && userRole) {
 			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
 				router.replace("/(partner)")
-			} else if (userRole !== "partner" && (inPartnerGroup || inAuthGroup)) {
+			} else if (
+				userRole !== "partner" &&
+				(inPartnerGroup || inAuthGroup)
+			) {
 				router.replace("/(tabs)")
 			}
 		}
