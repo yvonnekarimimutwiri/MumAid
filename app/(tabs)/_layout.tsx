@@ -50,7 +50,7 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="mumtalkdummy"
+				name="mumtalk"
 				options={{
 					title: "MumTalk",
 					tabBarIcon: ({ color, focused }) => (
@@ -65,7 +65,7 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="mumtalk"
+				name="mumtalkdummy"
 				options={{
 					href: null,
 				}}

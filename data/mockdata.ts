@@ -113,16 +113,16 @@ export const VIDEOS: VideoType[] = [
 	// },
 	{
 		id: "2",
-		source: require("@/assets/uploads/newborn_tips_for_beginners.mp4"),
-		// source: "",
+		// source: require("@/assets/uploads/newborn_tips_for_beginners.mp4"),
+		source: "",
 		topic: "FEEDING",
 		caption: "Newborn nany tips",
 		comments: [{ text: "Very insightful", user: "Robert Davids" }],
 	},
 	{
 		id: "3",
-		source: require("@/assets/uploads/tips_for_expecting_mums.mp4"),
-		// source: "",
+		// source: require("@/assets/uploads/tips_for_expecting_mums.mp4"),
+		source: "",
 		topic: "TIPS",
 		caption: "Tips for expecting mums.",
 		comments: [
