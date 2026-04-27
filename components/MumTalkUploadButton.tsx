@@ -73,12 +73,19 @@ export default function MumTalkUploadButton({
 
 		xhr.onload = () => {
 			if (xhr.status === 201 || xhr.status === 200) {
-				const response = JSON.parse(xhr.response)
-				onUploadSuccess(response.data)
-				Alert.alert("Success", "Video uploaded!")
-
-				setTitle("")
-				setDescription("")
+				try {
+					const response = JSON.parse(xhr.response)
+					onUploadSuccess(response.data)
+					Alert.alert("Success", "Video uploaded!")
+					setTitle("")
+					setDescription("")
+				} catch (error) {
+					console.log("Upload response parse error:", error)
+					Alert.alert(
+						"Error",
+						"Upload completed, but response was invalid.",
+					)
+				}
 			} else {
 				console.log("Server Error Body:", xhr.response)
 				Alert.alert(
@@ -94,6 +101,11 @@ export default function MumTalkUploadButton({
 			setIsUploading(false)
 			setUploadProgress(0)
 			Alert.alert("Error", "Network error.")
+		}
+
+		xhr.onabort = () => {
+			setIsUploading(false)
+			setUploadProgress(0)
 		}
 
 		xhr.open("POST", `${BASE_URL}/feeds/v1/upload/video/`)
