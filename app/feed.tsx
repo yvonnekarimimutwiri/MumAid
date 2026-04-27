@@ -30,7 +30,6 @@ export default function FeedScreen() {
 
 	const navigation = useNavigation()
 	const tabNavigation = navigation.getParent("tabs") || navigation.getParent()
-	console.log(tabNavigation)
 
 	useFocusEffect(
 		useCallback(() => {

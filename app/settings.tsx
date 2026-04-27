@@ -16,6 +16,7 @@ import {
 	TextInput,
 	View,
 } from "react-native"
+import { useAuth } from "@/context/AuthContext"
 
 export const options = { title: "Settings" }
 const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
@@ -28,6 +29,8 @@ export default function SettingsScreen() {
 	const [supportContacts, setSupportContacts] = useState([
 		{ name: "", phone: "" },
 	])
+
+	const { logout } = useAuth()
 	const router = useRouter()
 
 	const loadProfileData = useCallback(async () => {
@@ -46,8 +49,16 @@ export default function SettingsScreen() {
 	)
 
 	const handleLogout = async () => {
-		await tokenStorage.clearTokens()
-		router.replace("/(auth)/login")
+		Alert.alert("Logout", "Are you sure you want to log out?", [
+			{ text: "Cancel", style: "cancel" },
+			{
+				text: "Logout",
+				style: "destructive",
+				onPress: async () => {
+					await logout()
+				},
+			},
+		])
 	}
 
 	const handleSwitchAccount = async (email: string) => {
@@ -334,7 +345,7 @@ export default function SettingsScreen() {
 				</Pressable>
 			</View>
 
-			<View className="mt-4 rounded-2xl border border-fuchsia-200 bg-white p-4">
+			<View className="my-4 rounded-2xl border border-fuchsia-200 bg-white p-4">
 				<Text className="text-xs text-mum-ink/70">Account email</Text>
 				<Text className="mt-1 text-sm text-mum-purpleDeep">
 					{accountEmail || "Unknown account"}

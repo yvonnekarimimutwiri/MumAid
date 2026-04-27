@@ -170,7 +170,6 @@ function VideoItem({
 
 	const submitComment = () => {
 		if (!commentText.trim()) return
-		console.log(`Submitting to ${replyTarget || "Video"}: ${commentText}`)
 		// Reset after submit
 		setCommentText("")
 		setReplyTarget(null)
@@ -313,7 +312,7 @@ function VideoItem({
 						</Text>
 						<View className="mt-4 flex-row items-center gap-6">
 							<Pressable
-								onPress={() => console.log("Like")}
+								onPress={() => {}}
 								className="flex-row items-center gap-2"
 							>
 								<Ionicons
@@ -326,7 +325,7 @@ function VideoItem({
 								</Text>
 							</Pressable>
 							<Pressable
-								onPress={() => console.log("Share")}
+								onPress={() => {}}
 								className="flex-row items-center gap-2"
 							>
 								<Ionicons

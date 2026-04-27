@@ -1,20 +1,19 @@
+import { BASE_URL } from "@/constants/Config"
+import { useAuth } from "@/context/AuthContext"
 import { authApi } from "@/utils/auth"
 import { tokenStorage } from "@/utils/storage"
+import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
+import * as WebBrowser from "expo-web-browser"
 import { useState } from "react"
 import {
+	ActivityIndicator,
 	Alert,
 	Pressable,
 	Text,
 	TextInput,
 	View,
-	Image,
-	ActivityIndicator,
 } from "react-native"
-import * as WebBrowser from 'expo-web-browser';
-import * as Linking from "expo-linking"
-import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
-import { BASE_URL } from "@/constants/Config"
 
 const GoogleLogo = require("@/assets/icons/googleg_standard_color_128dp.png")
 
@@ -26,38 +25,55 @@ export default function LoginScreen() {
 	const [loading, setLoading] = useState(false)
 	const [googleLoading, setGoogleLoading] = useState(false)
 
+	const { login } = useAuth()
 	const router = useRouter()
 
 	const handleLogin = async () => {
-		if (!email || !password)
+		if (!email || !password) {
 			return Alert.alert(
 				"Missing info",
 				"Please enter both email and password",
 			)
+		}
 
 		setLoading(true)
 		try {
+			// 1. Get Tokens
 			const res = await authApi.login({ email, password })
 			const data = await res.json()
 
 			if (res.ok) {
-				const roleFromResponse =
-					data?.role ??
-					data?.user?.role ??
-					data?.user_type ??
-					data?.account_type ??
-					null
-				const emailFromResponse = data?.email ?? data?.user?.email ?? email
-				await tokenStorage.saveTokens(
-					data.access,
-					data.refresh,
-					String(emailFromResponse),
-				)
-				await tokenStorage.saveUserProfile({
-					email: String(emailFromResponse),
-					role: roleFromResponse ? String(roleFromResponse) : null,
-				})
-				router.replace("/(tabs)")
+				const accessToken = data.access
+
+				// 2. Immediately fetch the role from /whoami/
+				// Since login doesn't provide it, we use the new token to ask
+				const whoRes = await authApi.whoami(accessToken)
+
+				if (whoRes.ok) {
+					const userData = await whoRes.json()
+					const role = userData.role // e.g., "partner" or "mother"
+
+					// 3. Save everything to permanent storage
+					await tokenStorage.saveTokens(
+						data.access,
+						data.refresh,
+						email, // use input email since backend didn't return it
+					)
+
+					await tokenStorage.saveUserProfile({
+						email: email,
+						role: role,
+					})
+
+					// 4. Update Global State
+					// This will trigger the redirect in RootLayout
+					login(accessToken, role)
+				} else {
+					Alert.alert(
+						"Error",
+						"Could not verify user role. Please try again.",
+					)
+				}
 			} else {
 				Alert.alert(
 					"Login Failed",
@@ -143,13 +159,13 @@ export default function LoginScreen() {
 				)}
 			</Pressable>
 
-			<View className="flex-row items-center my-6">
+			{/* <View className="flex-row items-center my-6">
 				<View className="flex-1 h-[1px] bg-zinc-200" />
 				<Text className="mx-4 text-zinc-400 font-medium">OR</Text>
 				<View className="flex-1 h-[1px] bg-zinc-200" />
-			</View>
+			</View> */}
 
-			<Pressable
+			{/* <Pressable
 				onPress={handleGoogleLogin}
 				disabled={googleLoading || loading}
 				className="border border-zinc-200 p-4 rounded-full flex-row justify-center items-center gap-3 active:bg-zinc-50"
@@ -168,7 +184,7 @@ export default function LoginScreen() {
 						</Text>
 					</>
 				)}
-			</Pressable>
+			</Pressable> */}
 
 			<View className="flex-row justify-center mt-10">
 				<Text className="text-zinc-500">Don't have an account? </Text>

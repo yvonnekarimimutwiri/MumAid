@@ -164,7 +164,6 @@ export default function PartnerScreen() {
 									<Pressable
 										disabled={isSendDisabled}
 										onPress={() => {
-											console.log("Sending:", customText)
 											setIsModalVisible(false)
 											setCustomText("")
 										}}

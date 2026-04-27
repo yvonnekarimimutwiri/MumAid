@@ -8,68 +8,44 @@ import "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import "./global.css"
 import { authApi } from "@/utils/auth"
+import { AuthProvider, useAuth } from "@/context/AuthContext"
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-	const [isReady, setIsReady] = useState(false)
-	const [hasToken, setHasToken] = useState(false)
-	const [userRole, setUserRole] = useState<string | null>(null)
+	return (
+		<AuthProvider>
+			<MainLayout />
+		</AuthProvider>
+	)
+}
 
+function MainLayout() {
+	const { hasToken, userRole, isLoading } = useAuth()
 	const segments = useSegments()
 	const router = useRouter()
 
 	useEffect(() => {
-		const initializeAuth = async () => {
-			try {
-				const token = await tokenStorage.getAccessToken()
-				if (token) {
-					setHasToken(true)
-					const res = await authApi.whoami(token)
-					if (res.ok) {
-						const data = await res.json()
-						setUserRole(data.role)
-					}
-				}
-			} catch (e) {
-				setHasToken(false)
-			} finally {
-				setIsReady(true)
-			}
-		}
-		initializeAuth()
-	}, [])
-
-	useEffect(() => {
-		if (!isReady) return
+		if (isLoading) return
 
 		const inAuthGroup = segments[0] === "(auth)"
 		const inPartnerGroup = segments[0] === "(partner)"
 		const inTabsGroup = segments[0] === "(tabs)"
 
-
-		const timeout = setTimeout(() => {
-			if (!hasToken && !inAuthGroup) {
-				router.replace("/(auth)/login")
-			} else if (hasToken) {
-				if (userRole === "partner") {
-					if (inAuthGroup || inTabsGroup) {
-						router.replace("/(partner)")
-					}
-				} else {
-					if (inPartnerGroup || inAuthGroup) {
-						router.replace("/(tabs)")
-					}
-				}
+		if (!hasToken && !inAuthGroup) {
+			router.replace("/(auth)/login")
+		} else if (hasToken && userRole) {
+			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
+				router.replace("/(partner)")
+			} else if (userRole !== "partner" && (inPartnerGroup || inAuthGroup)) {
+				router.replace("/(tabs)")
 			}
+		}
 
-			SplashScreen.hideAsync()
-		}, 1)
+		if (!isLoading) SplashScreen.hideAsync()
+	}, [hasToken, userRole, isLoading, segments])
 
-		return () => clearTimeout(timeout)
-	}, [isReady, segments, hasToken, userRole])
-
-	if (!isReady) return null
+	if (isLoading) return null
 
 	return (
 		<ThemeProvider>

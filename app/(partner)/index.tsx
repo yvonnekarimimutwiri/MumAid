@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons"
-import { ScrollView, Text, View, Pressable, TextInput } from "react-native"
+import { ScrollView, Text, View, Pressable, TextInput, Alert } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { LinearGradient } from "expo-linear-gradient"
 import { TaskItem } from "@/components/TaskItem"
@@ -7,6 +7,7 @@ import { Link } from "expo-router"
 import { useEffect, useMemo, useState } from "react"
 import { Image } from "expo-image"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useAuth } from "@/context/AuthContext"
 
 const tasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
@@ -23,6 +24,8 @@ export default function PartnerTabScreen() {
 	)
 	const [manualAgeMonths, setManualAgeMonths] = useState("")
 	const [childGender, setChildGender] = useState<"female" | "male">("female")
+
+	const { logout } = useAuth()
 
 	useEffect(() => {
 		const loadChildGender = async () => {
@@ -59,6 +62,19 @@ export default function PartnerTabScreen() {
 		)
 		return buildAgeData(computedMonths, childGender)
 	}, [registrationDate, manualAgeMonths, childGender])
+
+	const handleLogout = async () => {
+			Alert.alert("Logout", "Are you sure you want to log out?", [
+				{ text: "Cancel", style: "cancel" },
+				{
+					text: "Logout",
+					style: "destructive",
+					onPress: async () => {
+						await logout()
+					},
+				},
+			])
+		}
 
 	return (
 		<View
@@ -224,6 +240,15 @@ export default function PartnerTabScreen() {
 						</Pressable>
 					</View>
 				</View>
+
+				<Pressable
+					onPress={handleLogout}
+					className="mt-6 self-start w-full flex-row justify-center rounded-full bg-rose-600 px-4 py-4 active:opacity-90"
+				>
+					<Text className="text-md font-bold text-white">
+						Logout
+					</Text>
+				</Pressable>
 			</ScrollView>
 		</View>
 	)
