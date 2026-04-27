@@ -4,14 +4,14 @@ import { Ionicons } from "@expo/vector-icons"
 import * as ImagePicker from "expo-image-picker"
 import React, { useRef, useState } from "react"
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
-    Text,
-    TextInput,
-    View,
+	Alert,
+	KeyboardAvoidingView,
+	Modal,
+	Platform,
+	Pressable,
+	Text,
+	TextInput,
+	View,
 } from "react-native"
 
 export default function MumTalkUploadButton({
@@ -53,10 +53,8 @@ export default function MumTalkUploadButton({
 		formData.append(
 			"attributes",
 			JSON.stringify({
-				attributes: {
-					title: vidTitle,
-					description: desc,
-				},
+				title: vidTitle,
+				description: desc,
 			}),
 		)
 
