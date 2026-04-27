@@ -50,16 +50,24 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="mumtalk"
+				name="mumtalkdummy"
 				options={{
 					title: "MumTalk",
 					tabBarIcon: ({ color, focused }) => (
 						<Ionicons
-							name={focused ? "play-circle" : "play-circle-outline"}
+							name={
+								focused ? "play-circle" : "play-circle-outline"
+							}
 							color={color}
 							size={24}
 						/>
 					),
+				}}
+			/>
+			<Tabs.Screen
+				name="mumtalk"
+				options={{
+					href: null,
 				}}
 			/>
 			<Tabs.Screen
@@ -88,12 +96,6 @@ export default function TabLayout() {
 							size={24}
 						/>
 					),
-				}}
-			/>
-			<Tabs.Screen
-				name="partnerf"
-				options={{
-					href: null,
 				}}
 			/>
 			<Tabs.Screen name="tips" options={{ href: null }} />
