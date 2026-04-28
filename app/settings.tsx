@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect } from "@react-navigation/native"
 import * as FileSystem from "expo-file-system"
+import { File } from "expo-file-system"
 import { Image } from "expo-image"
 import * as ImagePicker from "expo-image-picker"
 import { Link, useRouter } from "expo-router"
@@ -132,9 +133,10 @@ export default function SettingsScreen() {
 			const { uri } = result.assets[0]
 
 			try {
-				const fileInfo = await FileSystem.getInfoAsync(uri)
-				if (fileInfo.exists) {
-					const sizeInMb = fileInfo.size / (1024 * 1024)
+				const file = new File(uri)
+
+				if (file) {
+					const sizeInMb = file.size / (1024 * 1024)
 					if (sizeInMb > 10) {
 						Alert.alert(
 							"File Too Large",
@@ -176,9 +178,10 @@ export default function SettingsScreen() {
 			const { uri } = result.assets[0]
 
 			try {
-				const fileInfo = await FileSystem.getInfoAsync(uri)
-				if (fileInfo.exists) {
-					const sizeInMb = fileInfo.size / (1024 * 1024)
+				const file = new File(uri)
+
+				if (file) {
+					const sizeInMb = file.size / (1024 * 1024)
 					if (sizeInMb > 10) {
 						Alert.alert(
 							"Photo Too Large",
@@ -204,6 +207,9 @@ export default function SettingsScreen() {
 	const handleRemovePhoto = async () => {
 		setIsUploading(true)
 		try {
+			setProfilePhotoUri(null)
+			await AsyncStorage.removeItem(PROFILE_PHOTO_KEY)
+
 			const response = await fetch(`${BASE_URL}/auth/v1/profile/image/`, {
 				method: "PUT",
 				headers: {
@@ -213,11 +219,8 @@ export default function SettingsScreen() {
 			})
 
 			if (!response.ok) {
-				Alert.alert("Failed to remove photo from server")
+				throw new Error("Failed to remove photo from server")
 			}
-
-			setProfilePhotoUri(null)
-			await AsyncStorage.removeItem(PROFILE_PHOTO_KEY)
 
 			Alert.alert("Removed", "Profile photo has been removed.")
 		} catch (error) {
