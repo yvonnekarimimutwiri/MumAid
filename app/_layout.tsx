@@ -30,9 +30,9 @@ function MainLayout() {
 		const inPartnerGroup = segments[0] === "(partner)"
 		const inTabsGroup = segments[0] === "(tabs)"
 
-		if (!hasToken && !inAuthGroup) {
+		if ((!hasToken) && !inAuthGroup) {
 			router.replace("/(auth)/login")
-		} else if (hasToken && userRole) {
+		} else if (hasToken) {
 			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
 				router.replace("/(partner)")
 			} else if (
