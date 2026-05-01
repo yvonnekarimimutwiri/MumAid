@@ -18,9 +18,11 @@ import {
 	Text,
 	View,
 } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function FeedScreen() {
 	const { token } = useAuth()
+	const insets = useSafeAreaInsets()
 	const navigation = useNavigation()
 	const isFocused = useIsFocused()
 
@@ -40,8 +42,8 @@ export default function FeedScreen() {
 				tabBarStyle: {
 					backgroundColor: "#000000",
 					borderTopColor: "rgba(0,0,0,0)",
-					height: 88,
-					paddingBottom: 28,
+					height: insets.bottom > 0 ? insets.bottom + 65 : 88,
+					paddingBottom: insets.bottom > 0 ? insets.bottom : 28,
 					paddingTop: 12,
 				},
 				tabBarActiveTintColor: "#d946ef",
