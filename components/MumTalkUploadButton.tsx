@@ -50,15 +50,8 @@ export default function MumTalkUploadButton({
 			name: "upload.mp4",
 		})
 
-		formData.append(
-			"attributes",
-			JSON.stringify({
-				attributes: {
-					title: vidTitle,
-					description: desc,
-				},
-			}),
-		)
+		formData.append("attributes[title]", vidTitle)
+		formData.append("attributes[description]", desc)
 
 		const xhr = new XMLHttpRequest()
 		xhrRef.current = xhr

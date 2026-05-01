@@ -29,8 +29,8 @@ export default function MilkMapScreen() {
 					initialRegion={{
 						latitude: userLoc.latitude,
 						longitude: userLoc.longitude,
-						latitudeDelta: 0.0922,
-						longitudeDelta: 0.0421,
+						latitudeDelta: 0.1,
+						longitudeDelta: 0.1,
 					}}
 					showsUserLocation
 					showsMyLocationButton

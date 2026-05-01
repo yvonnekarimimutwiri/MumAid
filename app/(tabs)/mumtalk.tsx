@@ -132,8 +132,14 @@ export default function FeedScreen() {
 							screenHeight={viewHeight}
 							isActive={isFocused && activeIndex === index}
 							shouldLoad={Math.abs(activeIndex - index) <= 1}
-							onLoad={() => {
-								if (activeIndex === index) setIsVideoReady(true)
+							onLoad={(isTrue) => {
+								if (activeIndex === index) {
+									if (isTrue) {
+										setIsVideoReady(true)
+									} else {
+										setIsVideoReady(false)
+									}
+								}
 							}}
 						/>
 					))}

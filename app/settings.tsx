@@ -1,15 +1,18 @@
+import { BASE_URL } from "@/constants/Config"
+import { useAuth } from "@/context/AuthContext"
+import { tokenStorage } from "@/utils/storage"
 import { Ionicons } from "@expo/vector-icons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { Image } from "expo-image"
-import { useRouter } from "expo-router"
-import * as ImagePicker from "expo-image-picker"
-import * as FileSystem from "expo-file-system"
-import { Link } from "expo-router"
 import { useFocusEffect } from "@react-navigation/native"
+import * as FileSystem from "expo-file-system"
+import { File } from "expo-file-system"
+import { Image } from "expo-image"
+import * as ImagePicker from "expo-image-picker"
+import { Link, useRouter } from "expo-router"
 import { useCallback, useState } from "react"
-import { tokenStorage } from "@/utils/storage"
 import {
 	Alert,
+	Platform,
 	Pressable,
 	ScrollView,
 	Switch,
@@ -17,9 +20,6 @@ import {
 	TextInput,
 	View,
 } from "react-native"
-import { useAuth } from "@/context/AuthContext"
-import { Platform } from "react-native"
-import { BASE_URL } from "@/constants/Config"
 
 export const options = { title: "Settings" }
 const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
@@ -75,46 +75,37 @@ export default function SettingsScreen() {
 		router.replace("/(tabs)")
 	}
 
-	const saveProfilePhoto = async (uri: string) => {
+	const saveProfilePhoto = async (
+		uri: string,
+		mimeType: string,
+		fileName: string,
+	) => {
 		setIsUploading(true)
 		try {
-			// 1. Update local state and storage for immediate UI feedback
-			setProfilePhotoUri(uri)
-			await AsyncStorage.setItem(PROFILE_PHOTO_KEY, uri)
-
-			// 2. Prepare FormData
 			const formData = new FormData()
 			// @ts-ignore
-			formData.append("image", {
+			formData.append("profile_pic", {
 				uri: Platform.OS === "ios" ? uri.replace("file://", "") : uri,
-				type: "image/jpeg",
-				name: "profile_photo.jpg",
+				type: mimeType,
+				name: fileName,
 			})
 
-			// 3. Perform the PUT request
-			const response = await fetch(
-				`${BASE_URL}/api/auth/v1/profile/image/`,
-				{
-					method: "PUT",
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "multipart/form-data",
-					},
-					body: formData,
-				},
-			)
+			const response = await fetch(`${BASE_URL}/auth/v1/profile/image/`, {
+				method: "PUT",
+				headers: { Authorization: `Bearer ${token}` },
+				body: formData,
+			})
 
-			if (!response.ok) {
-				throw new Error("Failed to upload image to server")
+			if (response.ok) {
+				setProfilePhotoUri(uri)
+				await AsyncStorage.setItem(PROFILE_PHOTO_KEY, uri)
+				Alert.alert("Success", "Profile photo updated!")
+			} else {
+				const error = await response.json()
+				Alert.alert("Error", error.detail || "Upload failed")
 			}
-
-			Alert.alert("Success", "Profile photo updated successfully!")
-		} catch (error) {
-			console.error("Upload error:", error)
-			Alert.alert(
-				"Upload Failed",
-				"Your photo was saved locally but couldn't be synced to the server.",
-			)
+		} catch (e) {
+			Alert.alert("Error", "Network error")
 		} finally {
 			setIsUploading(false)
 		}
@@ -126,7 +117,7 @@ export default function SettingsScreen() {
 		if (!permission.granted) {
 			Alert.alert(
 				"Permission required",
-				"Please allow photo library access to upload a profile photo.",
+				"Please allow photo library access.",
 			)
 			return
 		}
@@ -139,7 +130,31 @@ export default function SettingsScreen() {
 		})
 
 		if (!result.canceled && result.assets[0]?.uri) {
-			await saveProfilePhoto(result.assets[0].uri)
+			const { uri } = result.assets[0]
+
+			try {
+				const file = new File(uri)
+
+				if (file) {
+					const sizeInMb = file.size / (1024 * 1024)
+					if (sizeInMb > 10) {
+						Alert.alert(
+							"File Too Large",
+							"Please select an image smaller than 10MB.",
+						)
+						return
+					}
+				}
+
+				const extension = uri.split(".").pop()?.toLowerCase()
+				const mimeType =
+					extension === "png" ? "image/png" : "image/jpeg"
+				const fileName = `profile_photo.${extension || "jpg"}`
+
+				await saveProfilePhoto(uri, mimeType, fileName)
+			} catch (error) {
+				console.error("Error processing image:", error)
+			}
 		}
 	}
 
@@ -160,13 +175,60 @@ export default function SettingsScreen() {
 		})
 
 		if (!result.canceled && result.assets[0]?.uri) {
-			await saveProfilePhoto(result.assets[0].uri)
+			const { uri } = result.assets[0]
+
+			try {
+				const file = new File(uri)
+
+				if (file) {
+					const sizeInMb = file.size / (1024 * 1024)
+					if (sizeInMb > 10) {
+						Alert.alert(
+							"Photo Too Large",
+							"The captured photo exceeds 10MB.",
+						)
+						return
+					}
+				}
+
+				const extension = uri.split(".").pop()?.toLowerCase() || "jpg"
+				const mimeType =
+					extension === "png" ? "image/png" : "image/jpeg"
+				const fileName = `camera_photo.${extension}`
+
+				await saveProfilePhoto(uri, mimeType, fileName)
+			} catch (error) {
+				console.error("Error processing camera photo:", error)
+				Alert.alert("Error", "Could not process captured photo.")
+			}
 		}
 	}
 
 	const handleRemovePhoto = async () => {
-		setProfilePhotoUri(null)
-		await AsyncStorage.removeItem(PROFILE_PHOTO_KEY)
+		setIsUploading(true)
+		try {
+			setProfilePhotoUri(null)
+			await AsyncStorage.removeItem(PROFILE_PHOTO_KEY)
+
+			const response = await fetch(`${BASE_URL}/auth/v1/profile/image/`, {
+				method: "PUT",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+				body: new FormData(),
+			})
+
+			if (!response.ok) {
+				throw new Error("Failed to remove photo from server")
+			}
+
+			Alert.alert("Removed", "Profile photo has been removed.")
+		} catch (error) {
+			console.error("Remove error:", error)
+			Alert.alert("Error", "Could not remove photo from server.")
+		} finally {
+			setIsUploading(false)
+		}
 	}
 
 	const updateSupportContact = (

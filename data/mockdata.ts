@@ -95,22 +95,22 @@ interface VideoType {
 }
 
 export const VIDEOS: VideoType[] = [
-	{
-		id: "1",
-		// source: require("@/assets/uploads/first_time_mom_5_hacks.mp4"),
-		source: "",
-		topic: "LIFESTYLE",
-		caption: "5 hacks for first-time mums.",
-		comments: [
-			{ text: "Cool", user: "John Doe" },
-			{ text: "Beautiful", user: "Daryl" },
-			{
-				text: "Very helpful",
-				user: "Earl Davis",
-				replies: [{ text: "Yes, learnt a lot", user: "Mr. Andrews" }],
-			},
-		],
-	},
+	// {
+	// 	id: "1",
+	// 	// source: require("@/assets/uploads/first_time_mom_5_hacks.mp4"),
+	// 	source: "",
+	// 	topic: "LIFESTYLE",
+	// 	caption: "5 hacks for first-time mums.",
+	// 	comments: [
+	// 		{ text: "Cool", user: "John Doe" },
+	// 		{ text: "Beautiful", user: "Daryl" },
+	// 		{
+	// 			text: "Very helpful",
+	// 			user: "Earl Davis",
+	// 			replies: [{ text: "Yes, learnt a lot", user: "Mr. Andrews" }],
+	// 		},
+	// 	],
+	// },
 	{
 		id: "2",
 		// source: require("@/assets/uploads/newborn_tips_for_beginners.mp4"),
