@@ -4,12 +4,12 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import { View } from "react-native"
 
 export const DEFAULT_THEME = {
-	"--mum-purple": "#B57EDC",
-	"--mum-purple-deep": "#6E3F9C",
-	"--mum-bg": "#fdf2f8",
-	"--mum-ink": "#2A1B3D",
-	"--mum-mist": "#faf5ff",
-	"--mum-petal": "#fce7f3",
+	"--color-mum-purple": "#B57EDC",
+	"--color-mum-purpleDeep": "#6E3F9C",
+	"--color-mum-bg": "#fdf2f8",
+	"--color-mum-ink": "#2A1B3D",
+	"--color-mum-mist": "#faf5ff",
+	"--color-mum-petal": "#fce7f3",
 }
 
 const ThemeContext = createContext({

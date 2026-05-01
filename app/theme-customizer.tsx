@@ -73,10 +73,12 @@ export default function ThemeCustomizer() {
 							key={palette.name}
 							onPress={() =>
 								updateTheme({
-									"--mum-purple-deep": palette.primary,
-									"--mum-bg": palette.bg,
-									"--mum-petal": palette.accent,
-									"--mum-purple": palette.primary + "80", // Shaded version
+									"--color-mum-purpleDeep":
+										palette.primary,
+									"--color-mum-bg": palette.bg,
+									"--color-mum-petal": palette.accent,
+									"--color-mum-purple":
+										palette.primary + "80", // Shaded version
 								})
 							}
 							className="mb-4 w-[48%] rounded-2xl border border-mum-petal bg-white p-3 active:scale-95"
