@@ -53,8 +53,10 @@ export default function MumTalkUploadButton({
 		formData.append(
 			"attributes",
 			JSON.stringify({
-				title: vidTitle,
-				description: desc,
+				attributes: {
+					title: vidTitle,
+					description: desc,
+				},
 			}),
 		)
 
