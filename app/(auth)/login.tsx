@@ -2,6 +2,7 @@ import { BASE_URL } from "@/constants/Config"
 import { useAuth } from "@/context/AuthContext"
 import { authApi } from "@/utils/auth"
 import { tokenStorage } from "@/utils/storage"
+import { Ionicons } from "@expo/vector-icons"
 import * as Linking from "expo-linking"
 import { useRouter } from "expo-router"
 import * as WebBrowser from "expo-web-browser"
@@ -23,6 +24,7 @@ export default function LoginScreen() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
+	const [showPassword, setShowPassword] = useState(false)
 	const [googleLoading, setGoogleLoading] = useState(false)
 
 	const { login } = useAuth()
@@ -38,26 +40,22 @@ export default function LoginScreen() {
 
 		setLoading(true)
 		try {
-			// 1. Get Tokens
 			const res = await authApi.login({ email, password })
 			const data = await res.json()
 
 			if (res.ok) {
 				const accessToken = data.access
 
-				// 2. Immediately fetch the role from /whoami/
-				// Since login doesn't provide it, we use the new token to ask
 				const whoRes = await authApi.whoami(accessToken)
 
 				if (whoRes.ok) {
 					const userData = await whoRes.json()
-					const role = userData.role // e.g., "partner" or "mother"
+					const role = userData.role
 
-					// 3. Save everything to permanent storage
 					await tokenStorage.saveTokens(
 						data.access,
 						data.refresh,
-						email, // use input email since backend didn't return it
+						email,
 					)
 
 					await tokenStorage.saveUserProfile({
@@ -65,8 +63,6 @@ export default function LoginScreen() {
 						role: role,
 					})
 
-					// 4. Update Global State
-					// This will trigger the redirect in RootLayout
 					login(accessToken, role)
 				} else {
 					Alert.alert(
@@ -138,14 +134,35 @@ export default function LoginScreen() {
 				autoCapitalize="none"
 				keyboardType="email-address"
 			/>
-			<TextInput
-				className="bg-zinc-100 p-4 rounded-2xl mb-8 text-zinc-800"
-				placeholder="Password"
-				placeholderTextColor="#a1a1aa"
-				secureTextEntry
-				value={password}
-				onChangeText={setPassword}
-			/>
+			<View className="relative mb-8">
+				<TextInput
+					className="bg-zinc-100 p-4 rounded-2xl text-zinc-800"
+					placeholder="Password"
+					placeholderTextColor="#a1a1aa"
+					secureTextEntry={showPassword ? false : true}
+					value={password}
+					onChangeText={setPassword}
+				/>
+				<View className="absolute h-full flex flex-col justify-center w-fit right-4">
+					{showPassword ? (
+						<Pressable onPress={() => setShowPassword(false)}>
+							<Ionicons
+								name={"eye-off"}
+								size={28}
+								color={"#71717a"}
+							/>
+						</Pressable>
+					) : (
+						<Pressable onPress={() => setShowPassword(true)}>
+							<Ionicons
+								name={"eye"}
+								size={28}
+								color={"#71717a"}
+							/>
+						</Pressable>
+					)}
+				</View>
+			</View>
 
 			<Pressable
 				onPress={handleLogin}

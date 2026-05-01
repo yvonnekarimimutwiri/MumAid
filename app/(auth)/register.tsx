@@ -1,5 +1,6 @@
 import RoleCard from "@/components/RoleCard"
 import { authApi } from "@/utils/auth"
+import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import React, { useState } from "react"
 import {
@@ -19,6 +20,7 @@ export default function RegisterScreen() {
 	const [password, setPassword] = useState("")
 	const [role, setRole] = useState<UserRole>("mother") // Default to mother
 	const [loading, setLoading] = useState(false)
+	const [showPassword, setShowPassword] = useState(false)
 	const router = useRouter()
 
 	const handleRegister = async () => {
@@ -90,14 +92,35 @@ export default function RegisterScreen() {
 					autoCapitalize="none"
 					keyboardType="email-address"
 				/>
-				<TextInput
-					className="bg-zinc-100 p-4 rounded-2xl mb-8 text-zinc-800"
-					placeholder="Password"
-					placeholderTextColor="#a1a1aa"
-					secureTextEntry
-					value={password}
-					onChangeText={setPassword}
-				/>
+				<View className="relative mb-8">
+					<TextInput
+						className="bg-zinc-100 p-4 rounded-2xl text-zinc-800"
+						placeholder="Password"
+						placeholderTextColor="#a1a1aa"
+						secureTextEntry={showPassword ? false : true}
+						value={password}
+						onChangeText={setPassword}
+					/>
+					<View className="absolute h-full flex flex-col justify-center w-fit right-4">
+						{showPassword ? (
+							<Pressable onPress={() => setShowPassword(false)}>
+								<Ionicons
+									name={"eye-off"}
+									size={28}
+									color={"#71717a"}
+								/>
+							</Pressable>
+						) : (
+							<Pressable onPress={() => setShowPassword(true)}>
+								<Ionicons
+									name={"eye"}
+									size={28}
+									color={"#71717a"}
+								/>
+							</Pressable>
+						)}
+					</View>
+				</View>
 
 				<Pressable
 					onPress={handleRegister}
