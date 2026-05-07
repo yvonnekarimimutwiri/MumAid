@@ -29,10 +29,11 @@ function MainLayout() {
 		const inAuthGroup = segments[0] === "(auth)"
 		const inPartnerGroup = segments[0] === "(partner)"
 		const inTabsGroup = segments[0] === "(tabs)"
+		const inMumTalkGroup = segments[0] === "(mumtalk)"
 
 		if ((!hasToken || !userRole) && !inAuthGroup) {
 			router.replace("/(auth)/login")
-		} else if (hasToken && userRole) {
+		} else if (hasToken && userRole && !inMumTalkGroup) {
 			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
 				router.replace("/(partner)")
 			} else if (
@@ -80,6 +81,10 @@ function ThemedAppLayout() {
 				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
 				<Stack.Screen
 					name="(partner)"
+					options={{ headerShown: false }}
+				/>
+				<Stack.Screen
+					name="(mumtalk)"
 					options={{ headerShown: false }}
 				/>
 				<Stack.Screen

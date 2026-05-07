@@ -1,19 +1,12 @@
-import MumTalkUploadButton from "@/components/MumTalkUploadButton"
-import VideoItem, { VideoData } from "@/components/VideoItem"
-import { useAuth } from "@/context/AuthContext"
-import { feedApi } from "@/utils/feed"
-import { useFocusEffect, useIsFocused } from "@react-navigation/native"
+import { useFocusEffect } from "@react-navigation/native"
+import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
-import { useNavigation } from "expo-router"
+import { useNavigation, useRouter } from "expo-router"
 import { setStatusBarStyle } from "expo-status-bar"
 import { useCallback, useEffect, useState } from "react"
 import {
 	ActivityIndicator,
-	Dimensions,
-	NativeScrollEvent,
-	NativeSyntheticEvent,
 	Platform,
-	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -21,18 +14,17 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function FeedScreen() {
-	const { token } = useAuth()
 	const insets = useSafeAreaInsets()
 	const navigation = useNavigation()
-	const isFocused = useIsFocused()
-
-	const [videos, setVideos] = useState<VideoData[]>([])
-	const [viewHeight, setViewHeight] = useState(
-		Dimensions.get("window").height,
-	)
-	const [activeIndex, setActiveIndex] = useState(0)
 	const [loading, setLoading] = useState(true)
-	const [isVideoReady, setIsVideoReady] = useState(false)
+
+	const router = useRouter()
+
+	useEffect(() => {
+		setLoading(true)
+		router.replace("/(mumtalk)")
+		setLoading(false)
+	}, [])
 
 	// RESTORED: TabBar & Status Bar Styling
 	useFocusEffect(
@@ -65,87 +57,26 @@ export default function FeedScreen() {
 		}, [navigation]),
 	)
 
-	useEffect(() => {
-		const loadFeed = async () => {
-			if (!token) return
-			try {
-				const res = await feedApi.getAllVideos(token)
-				if (res.ok) {
-					const data = await res.json()
-					setVideos(data)
-				}
-			} finally {
-				setLoading(false)
-			}
-		}
-		loadFeed()
-	}, [token])
-
-	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-		const index = Math.round(event.nativeEvent.contentOffset.y / viewHeight)
-		if (index !== activeIndex) {
-			setActiveIndex(index)
-			setIsVideoReady(false)
-		}
-	}
-
-	if (loading) return <ActivityIndicator className="flex-1" color="#d946ef" />
-
 	return (
-		<View
-			className="flex-1 bg-black"
-			onLayout={(e) => setViewHeight(e.nativeEvent.layout.height)}
-		>
+		<View className="flex-1 bg-black">
 			<LinearGradient
-				colors={
-					isVideoReady
-						? ["#000000", "#000000", "#000000"]
-						: ["#501584", "#3b1060", "#000000"]
-				}
+				colors={["#501584", "#3b1060", "#000000"]}
 				style={StyleSheet.absoluteFillObject}
 				locations={[0, 0.3, 0.7]}
 			/>
 
-			<MumTalkUploadButton
-				onUploadSuccess={(newVid) =>
-					setVideos((prev) => [newVid, ...prev])
-				}
-			/>
-
-			{videos.length === 0 ? (
-				<View className="h-screen flex-1 items-center justify-center p-4">
-					<Text className="text-lg font-bold text-white">
-						No videos available
+			{loading ? (
+				<ActivityIndicator className="flex-1" color="#d946ef" />
+			) : (
+				<View className="flex-1 items-center justify-center">
+					<Image
+						source={require("@/assets/icons/mumaid-icon-no-bg.png")}
+						style={{ width: 120, height: 120 }}
+					/>
+					<Text className="mt-4 text-zinc-500">
+						Failed to Load MumTalk
 					</Text>
 				</View>
-			) : (
-				<ScrollView
-					pagingEnabled
-					onScroll={handleScroll}
-					scrollEventThrottle={16}
-					snapToInterval={viewHeight}
-					decelerationRate="fast"
-					showsVerticalScrollIndicator={false}
-				>
-					{videos.map((video, index) => (
-						<VideoItem
-							key={video.id}
-							video={video}
-							screenHeight={viewHeight}
-							isActive={isFocused && activeIndex === index}
-							shouldLoad={Math.abs(activeIndex - index) <= 1}
-							onLoad={(isTrue) => {
-								if (activeIndex === index) {
-									if (isTrue) {
-										setIsVideoReady(true)
-									} else {
-										setIsVideoReady(false)
-									}
-								}
-							}}
-						/>
-					))}
-				</ScrollView>
 			)}
 		</View>
 	)
