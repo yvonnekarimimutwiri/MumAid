@@ -99,12 +99,34 @@ export default function LoginScreen() {
 				const { queryParams } = Linking.parse(result.url)
 
 				if (queryParams?.access && queryParams?.refresh) {
-					await tokenStorage.saveTokens(
-						String(queryParams.access),
-						String(queryParams.refresh),
-						String(queryParams.email || ""),
-					)
-					router.replace("/(tabs)")
+					const access = String(queryParams.access)
+					const refresh = String(queryParams.refresh)
+					const email = String(queryParams.email || "")
+					await tokenStorage.saveTokens(access, refresh, email || undefined)
+
+					const whoRes = await authApi.whoami(access)
+					if (whoRes.ok) {
+						const userData = (await whoRes.json()) as {
+							role?: string
+							email?: string
+						}
+						const role = userData.role ?? "mother"
+						const profileEmail =
+							email || userData.email || "last-used@local"
+						await tokenStorage.saveUserProfile({
+							email: profileEmail,
+							role,
+						})
+						login(access, role)
+						router.replace(
+							role === "partner" ? "/(partner)" : "/(tabs)",
+						)
+					} else {
+						Alert.alert(
+							"Error",
+							"Could not verify your account. Please try again.",
+						)
+					}
 				}
 			} else {
 				Alert.alert("Cancelled", "Google login was closed.")
@@ -204,7 +226,9 @@ export default function LoginScreen() {
 			</Pressable> */}
 
 			<View className="flex-row justify-center mt-10">
-				<Text className="text-zinc-500">Don't have an account? </Text>
+				<Text className="text-zinc-500">
+					{"Don't have an account? "}
+				</Text>
 				<Pressable onPress={() => router.push("/(auth)/register")}>
 					<Text className="text-fuchsia-600 font-bold">Sign Up</Text>
 				</Pressable>

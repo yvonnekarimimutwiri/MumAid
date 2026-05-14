@@ -195,8 +195,7 @@ export default function PartnerScreen() {
 				<View className="mt-6 items-center px-4">
 					<Ionicons name="heart" size={24} color="#db2777" />
 					<Text className="mt-2 text-center text-xs italic text-mum-ink/40 leading-5">
-						"Coming together is a beginning. Keeping together is
-						progress. Working together is success."
+						{`"Coming together is a beginning. Keeping together is progress. Working together is success."`}
 					</Text>
 				</View>
 			</ScrollView>

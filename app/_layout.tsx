@@ -30,13 +30,14 @@ function MainLayout() {
 		const inPartnerGroup = segments[0] === "(partner)"
 		const inTabsGroup = segments[0] === "(tabs)"
 
-		if ((!hasToken || !userRole) && !inAuthGroup) {
+		if (!hasToken && !inAuthGroup) {
 			router.replace("/(auth)/login")
-		} else if (hasToken && userRole) {
-			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
+		} else if (hasToken) {
+			const roleForNav = userRole ?? "mother"
+			if (roleForNav === "partner" && (inTabsGroup || inAuthGroup)) {
 				router.replace("/(partner)")
 			} else if (
-				userRole !== "partner" &&
+				roleForNav !== "partner" &&
 				(inPartnerGroup || inAuthGroup)
 			) {
 				router.replace("/(tabs)")

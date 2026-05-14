@@ -210,7 +210,7 @@ export default function PartnerTabScreen() {
 
 				<View className="flex-row items-center justify-between mb-4 px-1">
 					<Text className="text-sm font-bold uppercase tracking-widest text-mum-ink/40">
-						Tonight's Support
+						Tonight{"'"}s Support
 					</Text>
 					<Pressable className="active:opacity-50">
 						<Text className="text-xs font-bold text-mum-purpleDeep">
@@ -227,11 +227,11 @@ export default function PartnerTabScreen() {
 					<View className="items-center">
 						<Ionicons name="infinite" size={32} color="#B57EDC" />
 						<Text className="mt-2 text-center text-base font-bold text-mum-ink">
-							Link to Mother's App
+							Link to Mother{"'"}s App
 						</Text>
 						<Text className="mt-1 text-center text-sm text-mum-ink/50 leading-5">
 							Sync tasks in real-time so she can rest knowing
-							you've got it handled.
+							you{"'"}ve got it handled.
 						</Text>
 						<Pressable className="mt-4 rounded-full bg-mum-purpleDeep px-6 py-2 active:opacity-90">
 							<Text className="font-bold text-white">

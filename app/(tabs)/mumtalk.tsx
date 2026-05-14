@@ -1,6 +1,7 @@
 import MumTalkUploadButton from "@/components/MumTalkUploadButton"
 import VideoItem, { VideoData } from "@/components/VideoItem"
 import { useAuth } from "@/context/AuthContext"
+import { useTheme } from "@/context/ThemeContext"
 import { feedApi } from "@/utils/feed"
 import { useFocusEffect, useIsFocused } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
@@ -21,6 +22,7 @@ import {
 
 export default function FeedScreen() {
 	const { token } = useAuth()
+	const { theme } = useTheme()
 	const navigation = useNavigation()
 	const isFocused = useIsFocused()
 
@@ -38,13 +40,13 @@ export default function FeedScreen() {
 			setStatusBarStyle("light")
 			navigation?.setOptions({
 				tabBarStyle: {
-					backgroundColor: "#000000",
+					backgroundColor: theme["--color-mumtalk-gradient-ready-bottom"],
 					borderTopColor: "rgba(0,0,0,0)",
 					height: 88,
 					paddingBottom: 28,
 					paddingTop: 12,
 				},
-				tabBarActiveTintColor: "#d946ef",
+				tabBarActiveTintColor: theme["--color-mumtalk-upload-idle"],
 				tabBarInactiveTintColor: "#ffffff",
 			})
 
@@ -55,12 +57,13 @@ export default function FeedScreen() {
 						backgroundColor: "#fefbfd",
 						borderTopColor: "#f1f5f9",
 					},
-					tabBarActiveTintColor: "#6E3F9C",
+							tabBarActiveTintColor:
+								theme["--color-mum-purpleDeep"],
 					tabBarInactiveTintColor:
 						Platform.OS === "ios" ? "#000000" : "#52637a",
 				})
 			}
-		}, [navigation]),
+		}, [navigation, theme]),
 	)
 
 	useEffect(() => {
@@ -87,7 +90,13 @@ export default function FeedScreen() {
 		}
 	}
 
-	if (loading) return <ActivityIndicator className="flex-1" color="#d946ef" />
+	if (loading)
+		return (
+			<ActivityIndicator
+				className="flex-1"
+				color={theme["--color-mumtalk-upload-idle"]}
+			/>
+		)
 
 	return (
 		<View
@@ -97,8 +106,16 @@ export default function FeedScreen() {
 			<LinearGradient
 				colors={
 					isVideoReady
-						? ["#000000", "#000000", "#000000"]
-						: ["#501584", "#3b1060", "#000000"]
+						? [
+								theme["--color-mumtalk-gradient-ready-top"],
+								theme["--color-mumtalk-gradient-ready-mid"],
+								theme["--color-mumtalk-gradient-ready-bottom"],
+							]
+						: [
+								theme["--color-mumtalk-gradient-loading-top"],
+								theme["--color-mumtalk-gradient-loading-mid"],
+								theme["--color-mumtalk-gradient-loading-bottom"],
+							]
 				}
 				style={StyleSheet.absoluteFillObject}
 				locations={[0, 0.3, 0.7]}

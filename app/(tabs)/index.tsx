@@ -137,10 +137,6 @@ export default function TodayScreen() {
 					<Text className="mt-2 text-center text-[32px] font-bold leading-tight text-mum-ink">
 						Simplifying Motherhood, One Day at a Time
 					</Text>
-					<Text className="mt-3 text-center text-[15px] leading-5 text-mum-ink/70">
-						Practical support — no mood logs or daily check‑ins
-						required.
-					</Text>
 					<Link href="/baby" asChild>
 						<Pressable
 							className="mt-6 self-center rounded-full px-7 py-3.5 shadow-lg active:opacity-90"

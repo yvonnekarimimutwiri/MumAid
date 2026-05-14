@@ -1,4 +1,6 @@
+import { useAuth } from "@/context/AuthContext"
 import { authApi } from "@/utils/auth"
+import { tokenStorage } from "@/utils/storage"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useState, useRef } from "react"
 import {
@@ -15,6 +17,7 @@ export default function VerifyScreen() {
 	const [otp, setOtp] = useState(["", "", "", "", "", ""])
 	const [loading, setLoading] = useState(false)
 	const router = useRouter()
+	const { login } = useAuth()
 
 	const inputs = useRef<Array<TextInput | null>>([])
 
@@ -46,13 +49,45 @@ export default function VerifyScreen() {
 		setLoading(true)
 		try {
 			const res = await authApi.verifyOtp(email as string, otpString)
+			const data = (await res.json()) as {
+				detail?: string
+				access?: string
+				refresh?: string
+			}
 			if (res.ok) {
-				Alert.alert("Verified", "You can now log in.")
+				const emailStr = String(email || "")
+				if (data.access && data.refresh) {
+					await tokenStorage.saveTokens(
+						data.access,
+						data.refresh,
+						emailStr,
+					)
+					const whoRes = await authApi.whoami(data.access)
+					if (whoRes.ok) {
+						const userData = (await whoRes.json()) as {
+							role?: string
+							email?: string
+						}
+						const role = userData.role ?? "mother"
+						const profileEmail =
+							emailStr || userData.email || "last-used@local"
+						await tokenStorage.saveUserProfile({
+							email: profileEmail,
+							role,
+						})
+						login(data.access, role)
+						router.replace(
+							role === "partner" ? "/(partner)" : "/(tabs)",
+						)
+						return
+					}
+				}
+				Alert.alert("Verified", data.detail ?? "You can now log in.")
 				router.replace("/(auth)/login")
 			} else {
 				Alert.alert(
 					"Invalid Code",
-					"Please check your OTP and try again.",
+					data.detail ?? "Please check your OTP and try again.",
 				)
 			}
 		} finally {
