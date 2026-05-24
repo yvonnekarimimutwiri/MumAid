@@ -1,5 +1,11 @@
 import RoleCard from "@/components/RoleCard"
-import { authApi } from "@/utils/auth"
+import {
+	authApi,
+	formatAuthError,
+	normalizeUsername,
+	USERNAME_PATTERN,
+	type UserRole,
+} from "@/utils/auth"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import React, { useState } from "react"
@@ -13,9 +19,8 @@ import {
 	View,
 } from "react-native"
 
-type UserRole = "mother" | "partner"
-
 export default function RegisterScreen() {
+	const [username, setUsername] = useState("")
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [role, setRole] = useState<UserRole>("mother") // Default to mother
@@ -24,25 +29,39 @@ export default function RegisterScreen() {
 	const router = useRouter()
 
 	const handleRegister = async () => {
-		if (!email || !password)
+		const trimmedUsername = normalizeUsername(username)
+		const trimmedEmail = email.trim().toLowerCase()
+
+		if (!trimmedUsername || !trimmedEmail || !password) {
 			return Alert.alert("Error", "Please fill all fields")
+		}
+		if (!USERNAME_PATTERN.test(trimmedUsername)) {
+			return Alert.alert(
+				"Invalid username",
+				"Use 3–30 characters: letters, numbers, and underscores only.",
+			)
+		}
 
 		setLoading(true)
 		try {
 			const res = await authApi.register({
-				email,
+				email: trimmedEmail,
+				username: trimmedUsername,
 				password,
-				role, // Use the dynamic role state
+				role,
 			})
 			const data = await res.json()
 
 			if (res.ok) {
 				Alert.alert("Success", data.detail)
-				router.push({ pathname: "/(auth)/verify", params: { email } })
+				router.push({
+					pathname: "/(auth)/verify",
+					params: { email: trimmedEmail },
+				})
 			} else {
 				Alert.alert(
 					"Registration Failed",
-					data.detail || "Something went wrong",
+					formatAuthError(data, "Something went wrong"),
 				)
 			}
 		} catch (err) {
@@ -82,6 +101,19 @@ export default function RegisterScreen() {
 						onPress={() => setRole("partner")}
 					/>
 				</View>
+
+				<TextInput
+					className="bg-zinc-100 p-4 rounded-2xl mb-4 text-zinc-800"
+					placeholder="Username"
+					placeholderTextColor="#a1a1aa"
+					value={username}
+					onChangeText={setUsername}
+					autoCapitalize="none"
+					autoCorrect={false}
+				/>
+				<Text className="text-zinc-400 text-xs mb-4 -mt-2 px-1">
+					3–30 characters: letters, numbers, and underscores
+				</Text>
 
 				<TextInput
 					className="bg-zinc-100 p-4 rounded-2xl mb-4 text-zinc-800"

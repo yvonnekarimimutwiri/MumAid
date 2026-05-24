@@ -1,6 +1,11 @@
 import { BASE_URL } from "@/constants/Config"
 import { useAuth } from "@/context/AuthContext"
-import { authApi } from "@/utils/auth"
+import {
+	authApi,
+	buildLoginPayload,
+	formatAuthError,
+	isEmail,
+} from "@/utils/auth"
 import { tokenStorage } from "@/utils/storage"
 import { Ionicons } from "@expo/vector-icons"
 import * as Linking from "expo-linking"
@@ -21,7 +26,7 @@ const GoogleLogo = require("@/assets/icons/googleg_standard_color_128dp.png")
 WebBrowser.maybeCompleteAuthSession()
 
 export default function LoginScreen() {
-	const [email, setEmail] = useState("")
+	const [identifier, setIdentifier] = useState("")
 	const [password, setPassword] = useState("")
 	const [loading, setLoading] = useState(false)
 	const [showPassword, setShowPassword] = useState(false)
@@ -31,16 +36,18 @@ export default function LoginScreen() {
 	const router = useRouter()
 
 	const handleLogin = async () => {
-		if (!email || !password) {
+		if (!identifier.trim() || !password) {
 			return Alert.alert(
 				"Missing info",
-				"Please enter both email and password",
+				"Please enter your email or username and password",
 			)
 		}
 
 		setLoading(true)
 		try {
-			const res = await authApi.login({ email, password })
+			const res = await authApi.login(
+				buildLoginPayload(identifier, password),
+			)
 			const data = await res.json()
 
 			if (res.ok) {
@@ -49,21 +56,34 @@ export default function LoginScreen() {
 				const whoRes = await authApi.whoami(accessToken)
 
 				if (whoRes.ok) {
-					const userData = await whoRes.json()
-					const role = userData.role
+					const userData = (await whoRes.json()) as {
+						role?: string
+						email?: string
+					}
+					const role = userData.role ?? "mother"
+					const profileEmail =
+						userData.email ||
+						(isEmail(identifier)
+							? identifier.trim().toLowerCase()
+							: "")
 
 					await tokenStorage.saveTokens(
 						data.access,
 						data.refresh,
-						email,
+						profileEmail || undefined,
 					)
 
-					await tokenStorage.saveUserProfile({
-						email: email,
-						role: role,
-					})
+					if (profileEmail) {
+						await tokenStorage.saveUserProfile({
+							email: profileEmail,
+							role,
+						})
+					}
 
 					login(accessToken, role)
+					router.replace(
+						role === "partner" ? "/(partner)" : "/(tabs)",
+					)
 				} else {
 					Alert.alert(
 						"Error",
@@ -73,7 +93,7 @@ export default function LoginScreen() {
 			} else {
 				Alert.alert(
 					"Login Failed",
-					data.detail || "Invalid credentials",
+					formatAuthError(data, "Invalid credentials"),
 				)
 			}
 		} catch (err) {
@@ -149,12 +169,12 @@ export default function LoginScreen() {
 
 			<TextInput
 				className="bg-zinc-100 p-4 rounded-2xl mb-4 text-zinc-800"
-				placeholder="Email"
+				placeholder="Email or username"
 				placeholderTextColor="#a1a1aa"
-				value={email}
-				onChangeText={setEmail}
+				value={identifier}
+				onChangeText={setIdentifier}
 				autoCapitalize="none"
-				keyboardType="email-address"
+				autoCorrect={false}
 			/>
 			<View className="relative mb-8">
 				<TextInput
