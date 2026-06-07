@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons"
 import { useVideoPlayer, VideoView } from "expo-video"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
 	View,
 	Text,
@@ -8,8 +8,12 @@ import {
 	ActivityIndicator,
 	Pressable,
 	StyleSheet,
+	Share,
 } from "react-native"
-import VideoComments from "./VideoComments" // Update with your actual path
+import VideoComments from "./VideoComments"
+import { useAuth } from "@/context/AuthContext"
+import { feedInteractions } from "@/utils/feedInteractions"
+import { mumtalkStorage } from "@/utils/mumtalkStorage"
 
 export interface VideoData {
 	id: number
@@ -35,9 +39,11 @@ export default function VideoItem({
 	shouldLoad,
 	onLoad,
 }: VideoItemProps) {
+	const { token } = useAuth()
 	const [status, setStatus] = useState<string>("loading")
 	const [isUserPaused, setIsUserPaused] = useState(false)
 	const [showComments, setShowComments] = useState(false)
+	const [isSaved, setIsSaved] = useState(false)
 
 	const player = useVideoPlayer(
 		shouldLoad ? video.video_file.replace("video/upload/", "") : null,
@@ -77,6 +83,39 @@ export default function VideoItem({
 	}, [player, onLoad, isActive, status])
 
 	const togglePlay = () => setIsUserPaused(!isUserPaused)
+
+	useEffect(() => {
+		mumtalkStorage.isVideoSaved(video.id).then(setIsSaved)
+	}, [video.id])
+
+	const handleShare = async () => {
+		const title = video.attributes.title
+		const description = video.attributes.description
+		try {
+			await Share.share({
+				message: `${title}${description ? `\n\n${description}` : ""}\n\nWatch on MumAid`,
+				url: video.video_file,
+			})
+		} catch (e) {
+			console.error("Share failed", e)
+		}
+	}
+
+	const handleToggleSave = useCallback(async () => {
+		if (!token) return
+		const nextSaved = !isSaved
+		setIsSaved(nextSaved)
+		await feedInteractions.toggleVideoSave(
+			token,
+			{
+				id: video.id,
+				title: video.attributes.title,
+				description: video.attributes.description,
+				videoUrl: video.video_file,
+			},
+			nextSaved,
+		)
+	}, [token, isSaved, video])
 
 	return (
 		<View style={{ height: screenHeight }} className="w-full relative">
@@ -130,10 +169,10 @@ export default function VideoItem({
 							{video.attributes.description}
 						</Text>
 
-						<View className="mt-4 flex-row items-center gap-6">
+						<View className="mt-4 flex-row items-center flex-wrap gap-5">
 							<Pressable
 								onPress={() => setShowComments(true)}
-								className="flex-row items-center gap-2"
+								className="flex-row items-center gap-2 active:opacity-70"
 							>
 								<Ionicons
 									name="chatbubble"
@@ -144,6 +183,34 @@ export default function VideoItem({
 									Comments
 								</Text>
 							</Pressable>
+							<Pressable
+								onPress={handleShare}
+								className="flex-row items-center gap-2 active:opacity-70"
+							>
+								<Ionicons
+									name="share-social-outline"
+									size={20}
+									color="white"
+								/>
+								<Text className="text-white text-xs font-semibold">
+									Share
+								</Text>
+							</Pressable>
+							<Pressable
+								onPress={handleToggleSave}
+								className="flex-row items-center gap-2 active:opacity-70"
+							>
+								<Ionicons
+									name={isSaved ? "bookmark" : "bookmark-outline"}
+									size={20}
+									color={isSaved ? "#d946ef" : "white"}
+								/>
+								<Text
+									className={`text-xs font-semibold ${isSaved ? "text-fuchsia-400" : "text-white"}`}
+								>
+									{isSaved ? "Saved" : "Save"}
+								</Text>
+							</Pressable>
 						</View>
 					</View>
 				</View>
@@ -151,6 +218,7 @@ export default function VideoItem({
 
 			<VideoComments
 				videoId={video.id}
+				videoTitle={video.attributes.title}
 				visible={showComments}
 				onClose={() => setShowComments(false)}
 			/>
