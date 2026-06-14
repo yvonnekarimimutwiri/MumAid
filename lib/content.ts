@@ -26,6 +26,60 @@ export const remedyCards = [
 			"Give 10–15 minutes of diaper-free air time if safe and supervised.",
 		],
 	},
+	{
+		id: "stretch-marks",
+		title: "Stretch marks",
+		tips: [
+			"Moisturize daily — cocoa butter, shea butter, or unscented lotion right after shower while skin is still damp.",
+			"Gently massage affected areas for a few minutes; marks often fade from pink or purple to lighter silver over months.",
+			"Stay hydrated and eat protein-rich foods. Ask your provider about safe options (retinoids, laser) only if marks still bother you after breastfeeding.",
+		],
+	},
+	{
+		id: "postpartum-hair-loss",
+		title: "Postpartum hair loss",
+		tips: [
+			"It’s normal — many moms shed heavily around 3–6 months as hormones shift; growth usually returns on its own.",
+			"Use a wide-tooth comb, avoid tight ponytails, and choose gentle sulfate-free shampoo to reduce breakage.",
+			"Eat iron- and protein-rich foods. Mention heavy shedding past 12 months to your doctor.",
+		],
+	},
+	{
+		id: "skin-changes",
+		title: "Dry or sensitive skin",
+		tips: [
+			"Take lukewarm (not hot) showers and apply fragrance-free moisturizer within 3 minutes of bathing.",
+			"Wear loose cotton clothing on irritated areas; patch-test new products on a small spot first.",
+			"Call your provider for a spreading rash, fever, or painful blisters — you may need treatment beyond home care.",
+		],
+	},
+	{
+		id: "birth-healing",
+		title: "Healing after birth (scars & stitches)",
+		tips: [
+			"Keep incisions or tears clean and dry; pat gently — never rub. Follow your provider’s soak or spray instructions.",
+			"For C-section scars, once cleared by your doctor, silicone sheets or gel may soften the scar over several weeks.",
+			"Avoid heavy lifting until cleared. Call if you see increasing redness, pus, or worsening pain.",
+		],
+	},
+	{
+		id: "postpartum-swelling",
+		title: "Swelling (hands, feet, face)",
+		tips: [
+			"Elevate feet when resting, drink water steadily, and take short walks to help fluid move.",
+			"Cut back on extra salt; compression socks can help leg swelling if your provider says they’re safe for you.",
+			"Sudden swelling with headache or vision changes needs urgent care — contact your doctor or emergency services right away.",
+		],
+	},
+	{
+		id: "breast-changes",
+		title: "Breast changes & tenderness",
+		tips: [
+			"Wear a supportive, well-fitting bra — avoid underwire if it presses on sore areas.",
+			"Use warm compresses before feeds and cool packs after for engorgement or general tenderness.",
+			"See your provider or lactation consultant for hard lumps, fever, or cracked nipples that don’t improve in a day or two.",
+		],
+	},
 ] as const
 
 export const exerciseClips = [

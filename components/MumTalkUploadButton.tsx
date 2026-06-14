@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/constants/Config"
 import { useAuth } from "@/context/AuthContext"
+import { useTheme } from "@/context/ThemeContext"
 import { Ionicons } from "@expo/vector-icons"
 import * as ImagePicker from "expo-image-picker"
 import React, { useRef, useState } from "react"
@@ -20,6 +21,7 @@ export default function MumTalkUploadButton({
 	onUploadSuccess: (v: any) => void
 }) {
 	const { token } = useAuth()
+	const { theme } = useTheme()
 	const [isUploading, setIsUploading] = useState(false)
 	const [uploadProgress, setUploadProgress] = useState(0)
 
@@ -128,29 +130,50 @@ export default function MumTalkUploadButton({
 					behavior={Platform.OS === "ios" ? "padding" : "height"}
 					className="flex-1 bg-black/60 justify-center p-6"
 				>
-					<View className="bg-zinc-900 p-6 rounded-3xl border border-white/10 shadow-2xl">
+					<View
+						className="p-6 rounded-3xl border border-white/10 shadow-2xl"
+						style={{
+							backgroundColor: theme["--color-mumtalk-modal-bg"],
+						}}
+					>
 						<Text className="text-white font-bold text-xl mb-6 text-center">
 							Video Details
 						</Text>
 
-						<Text className="text-zinc-400 text-xs font-bold uppercase mb-2 ml-1">
+						<Text
+							className="text-xs font-bold uppercase mb-2 ml-1"
+							style={{ color: theme["--color-mumtalk-modal-label"] }}
+						>
 							Title
 						</Text>
 						<TextInput
-							className="bg-zinc-800 text-white p-4 rounded-xl mb-4 font-semibold"
+							className="text-white p-4 rounded-xl mb-4 font-semibold"
+							style={{
+								backgroundColor: theme["--color-mumtalk-modal-input-bg"],
+							}}
 							placeholder="Give your video a title..."
-							placeholderTextColor="#71717a"
+							placeholderTextColor={
+								theme["--color-mumtalk-modal-placeholder"]
+							}
 							value={title}
 							onChangeText={setTitle}
 						/>
 
-						<Text className="text-zinc-400 text-xs font-bold uppercase mb-2 ml-1">
+						<Text
+							className="text-xs font-bold uppercase mb-2 ml-1"
+							style={{ color: theme["--color-mumtalk-modal-label"] }}
+						>
 							Description
 						</Text>
 						<TextInput
-							className="bg-zinc-800 text-white p-4 rounded-xl mb-6 h-28"
+							className="text-white p-4 rounded-xl mb-6 h-28"
+							style={{
+								backgroundColor: theme["--color-mumtalk-modal-input-bg"],
+							}}
 							placeholder="What's this video about?"
-							placeholderTextColor="#71717a"
+							placeholderTextColor={
+								theme["--color-mumtalk-modal-placeholder"]
+							}
 							multiline
 							textAlignVertical="top"
 							value={description}
@@ -159,15 +182,26 @@ export default function MumTalkUploadButton({
 
 						<View className="flex-row gap-4">
 							<Pressable
-								className="flex-1 p-4 bg-zinc-800 rounded-2xl items-center active:bg-zinc-700"
+								className="flex-1 p-4 rounded-2xl items-center"
+								style={{
+									backgroundColor: theme["--color-mumtalk-modal-input-bg"],
+								}}
 								onPress={() => setShowModal(false)}
 							>
-								<Text className="text-zinc-300 font-bold">
+								<Text
+									className="font-bold"
+									style={{
+										color: theme["--color-mumtalk-modal-label"],
+									}}
+								>
 									Cancel
 								</Text>
 							</Pressable>
 							<Pressable
-								className="flex-1 p-4 bg-fuchsia-600 rounded-2xl items-center active:bg-fuchsia-500"
+								className="flex-1 p-4 rounded-2xl items-center"
+								style={{
+									backgroundColor: theme["--color-mumtalk-upload-idle"],
+								}}
 								onPress={() =>
 									uploadWithProgress(
 										tempUri,
@@ -194,7 +228,10 @@ export default function MumTalkUploadButton({
 							setIsUploading(false)
 							setUploadProgress(0)
 						}}
-						className="h-10 w-10 items-center justify-center rounded-full bg-red-500/80"
+						className="h-10 w-10 items-center justify-center rounded-full"
+						style={{
+							backgroundColor: `${theme["--color-mumtalk-upload-cancel"]}cc`,
+						}}
 					>
 						<Ionicons name="close" size={20} color="white" />
 					</Pressable>
@@ -203,10 +240,20 @@ export default function MumTalkUploadButton({
 				<Pressable
 					onPress={pickVideo}
 					disabled={isUploading}
-					className={`h-14 w-14 items-center justify-center rounded-full shadow-xl ${isUploading ? "bg-zinc-800" : "bg-fuchsia-500 active:scale-95"}`}
+					className="h-14 w-14 items-center justify-center rounded-full shadow-xl"
+					style={{
+						backgroundColor: isUploading
+							? theme["--color-mumtalk-modal-input-bg"]
+							: theme["--color-mumtalk-upload-idle"],
+					}}
 				>
 					{isUploading ? (
-						<Text className="text-[10px] font-bold text-fuchsia-400">
+						<Text
+							className="text-[10px] font-bold"
+							style={{
+								color: theme["--color-mumtalk-upload-progress"],
+							}}
+						>
 							{uploadProgress}%
 						</Text>
 					) : (
@@ -216,10 +263,18 @@ export default function MumTalkUploadButton({
 			</View>
 
 			{isUploading && (
-				<View className="mt-2 w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+				<View
+					className="mt-2 w-full h-1 rounded-full overflow-hidden"
+					style={{
+						backgroundColor: theme["--color-mumtalk-modal-input-bg"],
+					}}
+				>
 					<View
-						className="h-full bg-fuchsia-500"
-						style={{ width: `${uploadProgress}%` }}
+						className="h-full"
+						style={{
+							backgroundColor: theme["--color-mumtalk-upload-progress"],
+							width: `${uploadProgress}%`,
+						}}
 					/>
 				</View>
 			)}

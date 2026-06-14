@@ -12,6 +12,10 @@ const partnerTasks = [
 	"Hold the baby so she can shower without rushing.",
 	"Prep bottles / pump parts before bedtime.",
 	"Handle dishes tonight — she did every daytime feed.",
+	"Offer to handle the night time issues that may come up such as feeding, crying or changing diapers so that she can get some rest.",
+	"Help around with house chores.",
+	"Help in cooking meals.",
+	"Escort her to the clinic.",
 ]
 
 export default function PartnerScreen() {
@@ -195,8 +199,7 @@ export default function PartnerScreen() {
 				<View className="mt-6 items-center px-4">
 					<Ionicons name="heart" size={24} color="#db2777" />
 					<Text className="mt-2 text-center text-xs italic text-mum-ink/40 leading-5">
-						"Coming together is a beginning. Keeping together is
-						progress. Working together is success."
+						{`"Coming together is a beginning. Keeping together is progress. Working together is success."`}
 					</Text>
 				</View>
 			</ScrollView>

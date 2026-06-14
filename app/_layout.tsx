@@ -31,13 +31,14 @@ function MainLayout() {
 		const inTabsGroup = segments[0] === "(tabs)"
 		const inMumTalkGroup = segments[0] === "(mumtalk)"
 
-		if ((!hasToken || !userRole) && !inAuthGroup) {
+		if (!hasToken && !inAuthGroup) {
 			router.replace("/(auth)/login")
-		} else if (hasToken && userRole && !inMumTalkGroup) {
-			if (userRole === "partner" && (inTabsGroup || inAuthGroup)) {
+		} else if (hasToken && !inMumTalkGroup) {
+			const roleForNav = userRole ?? "mother"
+			if (roleForNav === "partner" && (inTabsGroup || inAuthGroup)) {
 				router.replace("/(partner)")
 			} else if (
-				userRole !== "partner" &&
+				roleForNav !== "partner" &&
 				(inPartnerGroup || inAuthGroup)
 			) {
 				router.replace("/(tabs)")

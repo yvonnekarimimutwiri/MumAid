@@ -144,10 +144,10 @@ export default function RomanceHubScreen() {
 			>
 				<View className="mx-6 mb-8 mt-6">
 					<Text className="text-xs font-bold uppercase tracking-[2px] text-mum-purpleDeep/40">
-						Today's activity
+						Today{"'"}s activity
 					</Text>
 					<Text className="mt-2 text-lg font-medium italic text-mum-ink/80">
-						"{dailyRitual}"
+						{`"${dailyRitual}"`}
 					</Text>
 				</View>
 
@@ -304,7 +304,7 @@ export default function RomanceHubScreen() {
 							className="mb-6 rounded-2xl p-6 border border-black/5"
 						>
 							<Text className="text-base font-medium leading-6 text-mum-inkDeep/80 italic">
-								"{tip}"
+								{`"${tip}"`}
 							</Text>
 						</View>
 					))}

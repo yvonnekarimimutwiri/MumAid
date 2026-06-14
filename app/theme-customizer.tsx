@@ -5,11 +5,41 @@ import { useTheme, DEFAULT_THEME } from "../context/ThemeContext"
 import { Stack } from "expo-router"
 
 const PRESET_PALETTES = [
-	{ name: "Original", primary: "#6E3F9C", bg: "#fdf2f8", accent: "#fce7f3" },
-	{ name: "Ocean", primary: "#0891b2", bg: "#f0f9ff", accent: "#bae6fd" },
-	{ name: "Sage", primary: "#166534", bg: "#f0fdf4", accent: "#dcfce7" },
-	{ name: "Sunset", primary: "#9a3412", bg: "#fff7ed", accent: "#ffedd5" },
-	{ name: "Slate", primary: "#334155", bg: "#f8fafc", accent: "#f1f5f9" },
+	{
+		name: "Original",
+		primary: "#6E3F9C",
+		bg: "#fdf2f8",
+		accent: "#fce7f3",
+		gradient: ["#501584", "#3b1060", "#000000"],
+	},
+	{
+		name: "Ocean",
+		primary: "#0891b2",
+		bg: "#f0f9ff",
+		accent: "#bae6fd",
+		gradient: ["#0e7490", "#155e75", "#082f49"],
+	},
+	{
+		name: "Sage",
+		primary: "#166534",
+		bg: "#f0fdf4",
+		accent: "#dcfce7",
+		gradient: ["#166534", "#14532d", "#052e16"],
+	},
+	{
+		name: "Sunset",
+		primary: "#9a3412",
+		bg: "#fff7ed",
+		accent: "#ffedd5",
+		gradient: ["#c2410c", "#9a3412", "#7c2d12"],
+	},
+	{
+		name: "Slate",
+		primary: "#334155",
+		bg: "#f8fafc",
+		accent: "#f1f5f9",
+		gradient: ["#334155", "#1e293b", "#0f172a"],
+	},
 ]
 
 export default function ThemeCustomizer() {
@@ -79,6 +109,16 @@ export default function ThemeCustomizer() {
 									"--color-mum-petal": palette.accent,
 									"--color-mum-purple":
 										palette.primary + "80", // Shaded version
+									"--color-mumtalk-upload-idle":
+										palette.primary,
+									"--color-mumtalk-upload-progress":
+										palette.primary,
+									"--color-mumtalk-gradient-loading-top":
+										palette.gradient[0],
+									"--color-mumtalk-gradient-loading-mid":
+										palette.gradient[1],
+									"--color-mumtalk-gradient-loading-bottom":
+										palette.gradient[2],
 								})
 							}
 							className="mb-4 w-[48%] rounded-2xl border border-mum-petal bg-white p-3 active:scale-95"

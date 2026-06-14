@@ -34,7 +34,7 @@ export default function SettingsScreen() {
 	])
 	const [isUploading, setIsUploading] = useState(false)
 
-	const { token, logout } = useAuth()
+	const { token, logout, syncSessionFromStorage } = useAuth()
 	const router = useRouter()
 
 	const loadProfileData = useCallback(async () => {
@@ -71,8 +71,9 @@ export default function SettingsScreen() {
 			Alert.alert("Switch failed", "Could not switch to this account.")
 			return
 		}
+		const role = await syncSessionFromStorage()
 		setAccountEmail(email)
-		router.replace("/(tabs)")
+		router.replace(role === "partner" ? "/(partner)" : "/(tabs)")
 	}
 
 	const saveProfilePhoto = async (
@@ -423,14 +424,14 @@ export default function SettingsScreen() {
 				</Pressable>
 			</Link>
 
-			<View className="mb-4 flex-row items-center justify-between rounded-2xl border border-fuchsia-200 bg-white px-4 py-3">
-				<View className="flex-row items-center gap-3 pr-2">
+			<View className="mb-4 flex-row items-start justify-between gap-3 rounded-2xl border border-fuchsia-200 bg-white p-4">
+				<View className="min-w-0 flex-1 flex-row items-start gap-3 pr-2">
 					<Ionicons name="finger-print" size={24} color="#B57EDC" />
-					<View className="flex-1">
+					<View className="min-w-0 flex-1">
 						<Text className="font-medium text-mum-ink">
 							Biometric lock
 						</Text>
-						<Text className="text-xs text-mum-ink/70">
+						<Text className="mt-1 text-xs text-mum-ink/70">
 							Face ID / fingerprint / PIN
 						</Text>
 					</View>
@@ -439,6 +440,7 @@ export default function SettingsScreen() {
 					value={bioLock}
 					onValueChange={setBioLock}
 					trackColor={{ true: "#B57EDC" }}
+					style={{ flexShrink: 0 }}
 				/>
 			</View>
 
