@@ -12,6 +12,10 @@ const partnerTasks = [
 	"Hold the baby so she can shower without rushing.",
 	"Prep bottles / pump parts before bedtime.",
 	"Handle dishes tonight — she did every daytime feed.",
+	"Offer to handle the night time issues that may come up such as feeding, crying or changing diapers so that she can get some rest.",
+	"Help around with house chores.",
+	"Help in cooking meals.",
+	"Escort her to the clinic.",
 ]
 
 export default function PartnerScreen() {
