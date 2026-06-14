@@ -76,7 +76,7 @@ export default function FeedScreen() {
 
 			{loading ? (
 				<ActivityIndicator className="flex-1" color="#d946ef" />
-			) : videos.length === 0 ? (
+			) : (!videos || videos.length === 0 || !Array.isArray(videos)) ? (
 				<View className="flex-1 items-center justify-center">
 					<Image
 						source={require("@/assets/icons/mumaid-icon-no-bg.png")}
