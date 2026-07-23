@@ -113,12 +113,6 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="mumtalkdummy"
-				options={{
-					href: null,
-				}}
-			/>
-			<Tabs.Screen
 				name="help"
 				options={{
 					title: "Get Help",

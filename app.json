@@ -47,7 +47,6 @@
           }
         }
       ],
-      "expo-video",
       "expo-secure-store"
     ],
     "experiments": {

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons"
-import { useVideoPlayer, VideoView } from "expo-video"
-import { useState, useEffect, useCallback } from "react"
+import { Video, ResizeMode, AVPlaybackStatus } from "expo-av"
+import { useState, useEffect, useCallback, useRef } from "react"
 import {
 	View,
 	Text,
@@ -40,47 +40,51 @@ export default function VideoItem({
 	onLoad,
 }: VideoItemProps) {
 	const { token } = useAuth()
+	const videoRef = useRef<Video>(null)
 	const [status, setStatus] = useState<string>("loading")
 	const [isUserPaused, setIsUserPaused] = useState(false)
 	const [showComments, setShowComments] = useState(false)
 	const [isSaved, setIsSaved] = useState(false)
 
-	const player = useVideoPlayer(
-		shouldLoad ? video.video_file.replace("video/upload/", "") : null,
-		(p) => {
-			p.loop = true
-		},
-	)
-
 	const isError = status === "error"
+	const videoUrl = shouldLoad
+		? video.video_file.replace("video/upload/", "")
+		: ""
 
+	// Handle play/pause commands based on activation state change loops
 	useEffect(() => {
-		if (!player) return
-		if (isActive && !isUserPaused && status === "readyToPlay") {
-			player.play()
+		if (!videoRef.current || status === "loading" || status === "error")
+			return
+
+		if (isActive && !isUserPaused) {
+			videoRef.current
+				.playAsync()
+				.catch((err) => console.log("Play failed: ", err))
 		} else {
-			player.pause()
+			videoRef.current
+				.pauseAsync()
+				.catch((err) => console.log("Pause failed: ", err))
 		}
-	}, [isActive, isUserPaused, status, player])
+	}, [isActive, isUserPaused, status])
 
-	useEffect(() => {
-		if (!player) return
-
-		const sub = player.addListener("statusChange", ({ status: s }) => {
-			setStatus(s)
-			if (s === "readyToPlay") {
-				onLoad(true)
-			} else if (s === "error") {
+	// Monitor loading lifecycle metrics cleanly via inline context objects
+	const handlePlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
+		if (!playbackStatus.isLoaded) {
+			if (playbackStatus.error) {
+				setStatus("error")
 				onLoad(false)
+			} else {
+				setStatus("loading")
 			}
-		})
-
-		if (isActive && status === "readyToPlay") {
-			onLoad(true)
+		} else {
+			if (playbackStatus.isBuffering) {
+				setStatus("buffering")
+			} else {
+				setStatus("readyToPlay")
+				onLoad(true)
+			}
 		}
-
-		return () => sub.remove()
-	}, [player, onLoad, isActive, status])
+	}
 
 	const togglePlay = () => setIsUserPaused(!isUserPaused)
 
@@ -120,12 +124,15 @@ export default function VideoItem({
 	return (
 		<View style={{ height: screenHeight }} className="w-full relative">
 			<View style={StyleSheet.absoluteFill} className="overflow-hidden">
-				{!isError ? (
-					<VideoView
-						player={player}
+				{!isError && videoUrl ? (
+					<Video
+						ref={videoRef}
+						source={{ uri: videoUrl }}
 						style={StyleSheet.absoluteFill}
-						contentFit="contain"
-						nativeControls={false}
+						resizeMode={ResizeMode.CONTAIN}
+						shouldPlay={isActive && !isUserPaused}
+						isLooping
+						onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
 					/>
 				) : (
 					<View className="flex-1 items-center justify-center">
@@ -201,7 +208,11 @@ export default function VideoItem({
 								className="flex-row items-center gap-2 active:opacity-70"
 							>
 								<Ionicons
-									name={isSaved ? "bookmark" : "bookmark-outline"}
+									name={
+										isSaved
+											? "bookmark"
+											: "bookmark-outline"
+									}
 									size={20}
 									color={isSaved ? "#d946ef" : "white"}
 								/>

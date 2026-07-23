@@ -5,8 +5,8 @@ import * as ImagePicker from "expo-image-picker"
 import { LinearGradient } from "expo-linear-gradient"
 import { useNavigation } from "expo-router"
 import { setStatusBarStyle } from "expo-status-bar"
-import { useVideoPlayer, VideoView } from "expo-video"
-import { useCallback, useEffect, useState } from "react"
+import { Video, ResizeMode, AVPlaybackStatus } from "expo-av"
+import { useCallback, useEffect, useState, useRef } from "react"
 import {
 	ActivityIndicator,
 	Dimensions,
@@ -54,8 +54,8 @@ export default function FeedScreen() {
 						borderTopColor: "#f1f5f9",
 					},
 					tabBarActiveTintColor: "#6E3F9C",
-									tabBarInactiveTintColor:
-										Platform.OS === "ios" ? "#000000" : "#52637a",
+					tabBarInactiveTintColor:
+						Platform.OS === "ios" ? "#000000" : "#52637a",
 				})
 			}
 		}, [tabNavigation]),
@@ -138,12 +138,9 @@ function VideoItem({
 	isActive: boolean
 	shouldLoad: boolean
 }) {
+	const videoRef = useRef<Video>(null)
 	const [status, setStatus] = useState<string>("loading")
 	const [isUserPaused, setIsUserPaused] = useState(false)
-
-	const player = useVideoPlayer(shouldLoad ? video.source : null, (p) => {
-		p.loop = true
-	})
 
 	// Reset pause state when scrolling to a new video
 	useEffect(() => {
@@ -154,48 +151,64 @@ function VideoItem({
 
 	// CORE PLAYBACK LOGIC
 	useEffect(() => {
-		if (!player) return
+		if (!videoRef.current || status === "error") return
 
-		if (isActive && !isUserPaused && status !== "error") {
-			player.play()
+		if (isActive && !isUserPaused) {
+			videoRef.current
+				.playAsync()
+				.catch((err) => console.log("Play error:", err))
 		} else {
-			player.pause()
+			videoRef.current
+				.pauseAsync()
+				.catch((err) => console.log("Pause error:", err))
 		}
-	}, [isActive, isUserPaused, player, status])
+	}, [isActive, isUserPaused, status])
 
-	useEffect(() => {
-		if (!player) return
-		const sub = player.addListener(
-			"statusChange",
-			({ status: newStatus }) => {
-				setStatus(newStatus)
-			},
-		)
-		return () => sub.remove()
-	}, [player])
+	// Parse legacy status flags seamlessly
+	const handlePlaybackStatusUpdate = (playbackStatus: AVPlaybackStatus) => {
+		if (!playbackStatus.isLoaded) {
+			if (playbackStatus.error) {
+				setStatus("error")
+			} else {
+				setStatus("loading")
+			}
+		} else {
+			if (playbackStatus.isBuffering) {
+				setStatus("buffering")
+			} else {
+				setStatus("readyToPlay")
+			}
+		}
+	}
 
 	const togglePlay = () => {
-		if (!player || status === "error") {
+		if (!videoRef.current || status === "error") {
 			return
 		}
 
 		if (!isUserPaused) {
-			player.pause()
+			videoRef.current.pauseAsync().catch((err) => console.log(err))
 			setIsUserPaused(true)
 		} else {
-			player.play()
+			videoRef.current.playAsync().catch((err) => console.log(err))
 			setIsUserPaused(false)
 		}
 	}
 
 	const isError = status === "error"
+	const videoSource = shouldLoad ? video.source : null
 
 	return (
 		<View style={{ height: screenHeight }} className="w-full relative">
 			<Pressable onPress={togglePlay} className="flex-1 overflow-hidden">
-				{!isError ? (
-					<VideoView
-						player={player}
+				{!isError && videoSource ? (
+					<Video
+						ref={videoRef}
+						source={
+							typeof videoSource === "string"
+								? { uri: videoSource }
+								: videoSource
+						}
 						style={{
 							position: "absolute",
 							bottom: 0,
@@ -204,8 +217,10 @@ function VideoItem({
 							aspectRatio: 9 / 16,
 							width: "100%",
 						}}
-						contentFit="contain"
-						nativeControls={false}
+						resizeMode={ResizeMode.CONTAIN}
+						shouldPlay={isActive && !isUserPaused}
+						isLooping
+						onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
 					/>
 				) : (
 					/* 1. Video Not Found State */
@@ -220,17 +235,17 @@ function VideoItem({
 						</Text>
 					</View>
 				)}
-
-				{/* Loading */}
-				{(status === "loading" || status === "buffering" || !player) &&
+				/* Loading */
+				{(status === "loading" ||
+					status === "buffering" ||
+					!videoSource) &&
 					shouldLoad &&
 					!isError && (
 						<View className="absolute inset-0 z-30 items-center justify-center">
 							<ActivityIndicator size="large" color="#d946ef" />
 						</View>
 					)}
-
-				{/* Play Button Overlay */}
+				/* Play Button Overlay */
 				{isUserPaused && status === "readyToPlay" && !isError && (
 					<View
 						pointerEvents="none"
@@ -246,13 +261,9 @@ function VideoItem({
 					</View>
 				)}
 			</Pressable>
-
-			{/* Caption Overlay */}
+			/* Caption Overlay */
 			{!isError && (
-				<View
-					// pointerEvents="box-none"
-					className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center"
-				>
+				<View className="absolute bottom-0 w-full p-6 pb-16 flex-row justify-center">
 					<View className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
 						<Text className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">
 							{video.topic}
