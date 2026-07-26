@@ -9,13 +9,13 @@ import { useState } from "react"
 
 const partnerTasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
+	"When she’s tired, handle night-time issues — feeding, crying, or diaper changes — so she can rest.",
 	"Hold the baby so she can shower without rushing.",
-	"Prep bottles / pump parts before bedtime.",
-	"Handle dishes tonight — she did every daytime feed.",
-	"Offer to handle the night time issues that may come up such as feeding, crying or changing diapers so that she can get some rest.",
 	"Help around with house chores.",
 	"Help in cooking meals.",
 	"Escort her to the clinic.",
+	"Prep bottles / pump parts before bedtime.",
+	"Handle dishes tonight — she did every daytime feed.",
 ]
 
 export default function PartnerScreen() {

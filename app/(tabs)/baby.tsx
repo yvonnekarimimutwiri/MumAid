@@ -1,13 +1,14 @@
 import { HubLinkRow } from "@/components/HubLinkRow"
 import { ScrollView, Text, View, Dimensions, Pressable, TextInput } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Link } from "expo-router"
+import { Link, type Href } from "expo-router"
 import { Ionicons } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
 import { useEffect, useMemo, useState } from "react"
 import { Image } from "expo-image"
 import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { screenFreeTips } from "@/lib/content"
 
 const { width } = Dimensions.get("window")
 const CHILD_GENDER_KEY = "mumaid_child_gender"
@@ -165,11 +166,33 @@ export default function CareHubScreen() {
 				</Text>
 				<View className="flex-col flex-wrap justify-center gap-4">
 					<HubLinkRow
-						href="/remedies"
-						title="Remedies"
+						href={"/remedies?focus=baby" as Href}
+						title="Baby Remedies"
 						icon="medkit"
 						variant="remedies"
 					/>
+				</View>
+
+				<Text className="mb-2 mt-8 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">
+					Keep them busy · no screens
+				</Text>
+				<Text className="mb-4 px-1 text-sm text-[#2D1643]/60">
+					Simple ideas to engage your child without TV or phones.
+				</Text>
+				<View className="mb-6 gap-3">
+					{screenFreeTips.map((item) => (
+						<View
+							key={item.id}
+							className="rounded-2xl border border-pink-100 bg-white p-4"
+						>
+							<Text className="text-sm font-bold text-mum-ink">
+								{item.title}
+							</Text>
+							<Text className="mt-1 text-sm leading-5 text-mum-ink/70">
+								{item.tip}
+							</Text>
+						</View>
+					))}
 				</View>
 
 				<Text className="mb-4 px-1 text-sm font-bold uppercase tracking-widest text-[#2D1643]/40">

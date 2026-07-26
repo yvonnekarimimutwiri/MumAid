@@ -1,11 +1,12 @@
 import { AnimatedBreathingButton } from "@/components/AnimatedBreathingButton"
 import { QuickInsightCard } from "@/components/today/QuickInsightCard"
+import { encouragementNotes, getDailyNote } from "@/lib/content"
 import { Ionicons } from "@expo/vector-icons"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect } from "@react-navigation/native"
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
-import { Link } from "expo-router"
+import { Link, type Href } from "expo-router"
 import { useCallback, useMemo, useState } from "react"
 import { Pressable, ScrollView, Text, View } from "react-native"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
@@ -16,25 +17,31 @@ const PROFILE_PHOTO_KEY = "mumaid_profile_photo_uri"
 
 const quickInsights = [
 	{
-		href: "/emergency" as const,
+		href: "/emergency" as Href,
 		label: "Emergency",
 		icon: "warning" as const,
 		accent: "rose" as const,
 	},
 	{
-		href: "/breathing-menu" as const,
+		href: "/breathing-menu" as Href,
 		label: "Breathe",
 		icon: "radio-button-on" as const,
 		accent: "fuchsia" as const,
 	},
 	{
-		href: "/remedies" as const,
+		href: "/remedies?focus=mum" as Href,
+		label: "Mum care",
+		icon: "heart" as const,
+		accent: "violet" as const,
+	},
+	{
+		href: "/remedies?focus=baby" as Href,
 		label: "Baby help",
 		icon: "medkit" as const,
 		accent: "violet" as const,
 	},
 	{
-		href: "/call-support" as const,
+		href: "/call-support" as Href,
 		label: "Call someone",
 		icon: "call" as const,
 		accent: "fuchsia" as const,
@@ -57,6 +64,7 @@ export default function TodayScreen() {
 		() => buildCalendarDays(displayedMonth),
 		[displayedMonth],
 	)
+	const dailyNote = useMemo(() => getDailyNote(encouragementNotes), [])
 
 	useFocusEffect(
 		useCallback(() => {
@@ -137,13 +145,18 @@ export default function TodayScreen() {
 					<Text className="mt-2 text-center text-[32px] font-bold leading-tight text-mum-ink">
 						Simplifying Motherhood, One Day at a Time
 					</Text>
-					<Link href="/baby" asChild>
+					<View className="mt-5 rounded-2xl border border-white/70 bg-white/55 px-4 py-3">
+						<Text className="text-center text-[15px] font-medium italic leading-6 text-mum-ink/85">
+							{`“${dailyNote}”`}
+						</Text>
+					</View>
+					<Link href={"/remedies?focus=mum" as Href} asChild>
 						<Pressable
 							className="mt-6 self-center rounded-full px-7 py-3.5 shadow-lg active:opacity-90"
 							style={{ backgroundColor: PURPLE_DEEP }}
 						>
 							<Text className="text-[15px] font-semibold text-white">
-								Browse care tools
+								Mum remedies & recovery
 							</Text>
 						</Pressable>
 					</Link>
@@ -160,7 +173,7 @@ export default function TodayScreen() {
 					>
 						<View className="flex-row pl-1 pr-4">
 							{quickInsights.map((q) => (
-								<QuickInsightCard key={q.href} {...q} />
+								<QuickInsightCard key={q.label} {...q} />
 							))}
 						</View>
 					</ScrollView>
@@ -168,6 +181,28 @@ export default function TodayScreen() {
 					<Text className="mb-3 mt-10 text-xs font-semibold uppercase tracking-wider text-mum-ink/45">
 						For you
 					</Text>
+					<Link href={"/remedies?focus=mum" as Href} asChild>
+						<Pressable className="mb-4 overflow-hidden rounded-3xl border border-pink-100 bg-white p-5 shadow-md shadow-purple-900/5 active:opacity-95">
+							<View className="flex-row items-start justify-between gap-3">
+								<View className="flex-1">
+									<Text className="text-lg font-semibold text-mum-ink">
+										Mum remedies
+									</Text>
+									<Text className="mt-2 text-sm leading-5 text-mum-ink/65">
+										After-birth recovery, stretch marks, hair
+										loss, swelling, and other body changes.
+									</Text>
+								</View>
+								<View className="rounded-2xl bg-[#fce7f3] p-3">
+									<Ionicons
+										name="heart"
+										size={28}
+										color={PURPLE}
+									/>
+								</View>
+							</View>
+						</Pressable>
+					</Link>
 					<Link href="/opportunities" asChild>
 						<Pressable className="overflow-hidden rounded-3xl border border-pink-100 bg-white p-5 shadow-md shadow-purple-900/5 active:opacity-95">
 							<View className="flex-row items-start justify-between gap-3">

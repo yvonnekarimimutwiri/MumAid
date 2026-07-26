@@ -8,16 +8,20 @@ import { useEffect, useMemo, useState } from "react"
 import { Image } from "expo-image"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useAuth } from "@/context/AuthContext"
+import {
+	getDailyNote,
+	partnerEncouragementNotes,
+} from "@/lib/content"
 
 const tasks = [
 	"Take the night feed so mom can sleep 4 hours straight.",
+	"When she’s tired, handle night-time issues — feeding, crying, or diaper changes — so she can rest.",
 	"Hold the baby so she can shower without rushing.",
-	"Prep bottles / pump parts before bedtime.",
-	"Handle dishes tonight — she did every daytime feed.",
-	"Offer to handle the night time issues that may come up such as feeding, crying or changing diapers so that she can get some rest.",
 	"Help around with house chores.",
 	"Help in cooking meals.",
 	"Escort her to the clinic.",
+	"Prep bottles / pump parts before bedtime.",
+	"Handle dishes tonight — she did every daytime feed.",
 ]
 const CHILD_GENDER_KEY = "mumaid_child_gender"
 
@@ -67,6 +71,11 @@ export default function PartnerTabScreen() {
 		return buildAgeData(computedMonths, childGender)
 	}, [registrationDate, manualAgeMonths, childGender])
 
+	const dailyNote = useMemo(
+		() => getDailyNote(partnerEncouragementNotes),
+		[],
+	)
+
 	const handleLogout = async () => {
 			Alert.alert("Logout", "Are you sure you want to log out?", [
 				{ text: "Cancel", style: "cancel" },
@@ -85,9 +94,14 @@ export default function PartnerTabScreen() {
 			className="flex-1 bg-mum-bg"
 			style={{ paddingTop: insets.top + 8 }}
 		>
-			<Text className="px-6 pb-6 text-3xl font-black text-mum-ink">
+			<Text className="px-6 pb-2 text-3xl font-black text-mum-ink">
 				Partner
 			</Text>
+			<View className="mx-6 mb-6 rounded-2xl border border-pink-100 bg-white px-4 py-3">
+				<Text className="text-center text-[15px] font-medium italic leading-6 text-mum-ink/85">
+					{`“${dailyNote}”`}
+				</Text>
+			</View>
 
 			<ScrollView
 				className="flex-1"
